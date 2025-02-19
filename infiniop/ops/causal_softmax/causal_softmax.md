@@ -1,37 +1,62 @@
 
 # `Causal Softmax`
 
-$\bullet$ `Causal Softmax`是使用causal mask的softmax函数，适用于各类因果类模型。     
-$\bullet$ 在`Softmax`的基础上引入mask，其中指数变换的操作维度限定在最后一维。    
-$\bullet$ 对于形状为$[s_0,\ldots, s_{r-1}]$的输入张量$x$来说，mask = $s_{r - 1} - s_{r - 2} \geq 0$，以形状为$[M, N], N \geq M$的张量$x$举例，`Causal Softmax`的数学变换如下所示：
+$\bullet$ `Causal Softmax` 是使用causal mask的softmax函数，其中指数变换的操作维度限定在最后一维，适用于各类因果类模型。     
+$\bullet$ 在`Softmax` 的基础上引入 mask，对于形状为 $[s_0,\ldots, s_{r-1}]$ 的输入张量 $x$ 来说，mask = $s_{r - 1} - s_{r - 2} \geq 0$。    
+$\bullet$ 以形状为 $[4, 7]$ 的张量 $x$ 举例，mask 变换如下所示：
+
 
 $$ \left[\begin{gathered}
-     x_{0,0} & \ldots & x_{0, mask} & x_{0, mask + 1} & x_{0, mask + 2} & \ldots & x_{0, N - 1}\\
-     x_{1,0} & \ldots & x_{1, mask} & x_{1, mask + 1} & x_{1, mask + 2} & \ldots & x_{1, N - 1}\\
-     \vdots \\
-     x_{M - 2,0} & \ldots & x_{M - 2, mask} & x_{M - 2, mask + 1} & x_{M - 2, mask + 2}& \ldots & x_{M - 2, N - 1} \\
-      x_{M - 1,0} & \ldots & x_{M - 1, mask} & x_{M - 1, mask + 1} & x_{M - 1, mask + 2}& \ldots & x_{M - 1, N - 1}
+     x_{0,0} & x_{0,1} & x_{0, 2} & x_{0, 3} & x_{0, 4} & x_{0,5} & x_{0, 6}\\
+     x_{1,0} & x_{1,1} & x_{1, 2} & x_{1, 3} & x_{1, 4} & x_{1,5} & x_{1, 6}\\
+     x_{2,0} & x_{2,1} & x_{2, 2} & x_{2, 3} & x_{2, 4} & x_{2,5} & x_{2, 6}\\
+     x_{3,0} & x_{3,1} & x_{3, 2} & x_{3, 3} & x_{3, 4} & x_{3,5} & x_{3, 6}
     \end{gathered}\right]  \Rightarrow $$
 $$ \left[\begin{gathered}
-     x_{0,0} & \ldots & x_{0, mask} & 0 & 0 & \ldots & 0\\
-     x_{1,0} & \ldots & x_{1, mask} & x_{1, mask + 1} & 0 & \ldots & 0\\
-     \vdots \\
-     x_{M - 2,0} & \ldots & x_{M - 2, mask} & x_{M - 2, mask + 1} & x_{M - 2, mask + 2}& \ldots & 0 \\
-     x_{M - 1,0} & \ldots & x_{M - 1, mask} & x_{M - 1, mask + 1} & x_{M - 1, mask + 2}& \ldots & x_{M - 1, N - 1}
-    \end{gathered}\right]  \Rightarrow $$
-$$ \left[\begin{gathered}
-     \frac{e^{x_{0,0}}}{\sum_{i=0}^{mask} e^{x_{0, i}}} & \ldots & \frac{e^{x_{0,mask}}}{\sum_{i=0}^{mask} e^{x_{0, i}}} & 0 & 0 & \ldots & 0\\
-     \frac{e^{x_{1,0}}}{\sum_{i=0}^{mask + 1} e^{x_{1, i}}} & \ldots & \frac{e^{x_{1,mask}}}{\sum_{i=0}^{mask + 1} e^{x_{1, i}}} & \frac{e^{x_{1,mask + 1}}}{\sum_{i=0}^{mask + 1} e^{x_{1, i}}} & 0 & \ldots & 0\\
-     \vdots \\
-     \frac{e^{x_{M - 2,0}}}{\sum_{i=0}^{N - 2} e^{x_{M - 2, i}}} & \ldots & \frac{e^{x_{M - 2,mask}}}{\sum_{i=0}^{N - 2} e^{x_{M - 2, i}}} & \frac{e^{x_{M - 2,mask + 1}}}{\sum_{i=0}^{N - 2} e^{x_{M - 2, i}}} & \frac{e^{x_{M - 2,mask + 2}}}{\sum_{i=0}^{N - 2} e^{x_{M - 2, i}}}& \ldots & 0 \\
-     \frac{e^{x_{M - 1,0}}}{\sum_{i=0}^{N - 1} e^{x_{M - 1, i}}} & \ldots & \frac{e^{x_{M - 1,mask}}}{\sum_{i=0}^{N - 1} e^{x_{M - 1, i}}} & \frac{e^{x_{M - 1,mask + 1}}}{\sum_{i=0}^{N - 1} e^{x_{M - 1, i}}} & \frac{e^{x_{M - 1,mask + 2}}}{\sum_{i=0}^{N - 1} e^{x_{M - 1, i}}}& \ldots & \frac{e^{x_{M - 1,N - 1}}}{\sum_{i=0}^{N - 1} e^{x_{M - 1, i}}}
+     x_{0,0} & x_{0,1} & x_{0, 2} & x_{0, 3} & 0 & 0 & 0\\
+     x_{1,0} & x_{1,1} & x_{1, 2} & x_{1, 3} & x_{1, 4} & 0 & 0\\
+     x_{2,0} & x_{2,1} & x_{2, 2} & x_{2, 3} & x_{2, 4} & x_{2,5} & 0\\
+     x_{3,0} & x_{3,1} & x_{3, 2} & x_{3, 3} & x_{3, 4} & x_{3,5} & x_{3, 6}
     \end{gathered}\right] $$
 
-$\bullet$ 对于其他维度的causal softmax变换，只需要将最后两个维度做上述mask变换即可。
+$\bullet$ 经过mask变换以后针对最后一维做 softmax 变换即可。  
+$\bullet$ 高维向量的 `Causal Softmax` 只需要考虑最后两维即可。
 
 
 
 ## 接口
+
+### 计算
+
+```c
+infiniopStatus_t infiniopCausalSoftmax(
+    infiniopCausalSoftmaxDescriptor_t desc, 
+    void *workspace, 
+    uint64_t workspace_size, 
+    void* data, 
+    void *stream
+);
+```
+<div style="background-color: lightblue; padding: 1px;"> 参数： </div>
+
+ - `desc`      
+     : 输入。已使用 `infiniopCreateCausalSoftmaxDescriptor()` 初始化的算子描述符。 
+ - `workspace`   
+	 : 输入。Device 指针，指向算子计算所需的额外工作空间。
+ - `workspace_size`   
+	 : 输入。`workspace` 的大小，单位：字节（byte）。
+ - `data`      
+     : 既是输入，也是输出。Device 常量指针，仅支持原地计算，张量限制见[创建算子描述](#创建算子描述)部分。
+ - `stream`    
+     : 输入。计算流/队列。
+
+
+<div style="background-color: lightblue; padding: 1px;">  返回值：</div>
+
+ - [`INFINIOP_STATUS_SUCCESS`](), [`INFINIOP_STATUS_BAD_PARAM`](), [`INFINIOP_STATUS_BAD_DEVICE`](), [`INFINIOP_STATUS_EXECUTION_FAILED`]()
+
+
+---
 
 ### 创建算子描述
 
@@ -39,16 +64,17 @@ $\bullet$ 对于其他维度的causal softmax变换，只需要将最后两个�
 infiniopStatus_t infiniopCreateCausalSoftmaxDescriptor(
     infiniopHandle_t handle, 
     infiniopCausalSoftmaxDescriptor_t *desc_ptr,  
-    infiniopTensorDescriptor_t t_desc);
+    infiniopTensorDescriptor_t t_desc
+);
 ```
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
  - `handle`    
-     : 输入，`infiniopHandle_t` 类型的硬件控柄。详情请看：[InfiniopHandle_t]()
+     : 输入。`infiniopHandle_t` 类型的硬件控柄。详情请看：[InfiniopHandle_t]()
  - `desc_ptr`    
-     : 输出，Host `infiniopCausalSoftmaxDescriptor_t` 指针，指向将被初始化的算子描述符地址。
- - `t_desc` ：dT         
-     : 输入，算子计算参数 `t_desc` 的张量描述，数据为$r$维张量，其中$r \geq 2$。
+     : 输出。Host `infiniopCausalSoftmaxDescriptor_t` 指针，指向将被初始化的算子描述符地址。
+ - `t_desc` - {dT}       
+     : 输入。算子计算参数 `t_desc` 的张量描述，数据为$r$维张量，其中$r \geq 2$。
 
 参数限制：
 
@@ -66,7 +92,8 @@ infiniopStatus_t infiniopCreateCausalSoftmaxDescriptor(
 ```c
 infiniopStatus_t infiniopGetCausalSoftmaxWorkspaceSize(
     infiniopCausalSoftmaxDescriptor_t desc, 
-    uint64_t *size);
+    uint64_t *size
+);
 ```
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
@@ -81,41 +108,12 @@ infiniopStatus_t infiniopGetCausalSoftmaxWorkspaceSize(
 
 ---
 
-### 计算
-
-```c
-infiniopStatus_t infiniopCausalSoftmax(
-    infiniopCausalSoftmaxDescriptor_t desc, 
-    void *workspace, 
-    uint64_t workspace_size, 
-    void* data, 
-    void *stream);
-```
-<div style="background-color: lightblue; padding: 1px;"> 参数： </div>
-
- - `desc`      
-     : 输入，已使用 `infiniopCreateCausalSoftmaxDescriptor()` 初始化的算子描述符。 
- - `workspace`   
-	 : 输入。Device 指针，指向算子计算所需的额外工作空间。
- - `workspace_size`   
-	 : 输入。`workspace` 的大小，单位：字节（byte）。
- - `data`      
-     : 既是输入，也是输出，Device 常量指针，张量限制见[创建算子描述](#创建算子描述)部分。
- - `stream`    
-     : 输入，计算流/队列。
-
-<div style="background-color: lightblue; padding: 1px;">  返回值：</div>
-
- - [`INFINIOP_STATUS_SUCCESS`](), [`INFINIOP_STATUS_BAD_PARAM`](), [`INFINIOP_STATUS_BAD_DEVICE`](), [`INFINIOP_STATUS_EXECUTION_FAILED`]()
-
-
----
-
 ### 销毁算子描述符
 
 ```c
 infiniopStatus_t infiniopDestroyCausalSoftmaxDescriptor(
-    infiniopCausalSoftmaxDescriptor_t desc);
+    infiniopCausalSoftmaxDescriptor_t desc
+);
 ```
 
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
@@ -131,6 +129,6 @@ infiniopStatus_t infiniopDestroyCausalSoftmaxDescriptor(
 
 ### 平台限制
 
-- 寒武纪不支持uint64或者是int64计算，传入shape或者stride的时候需要使用int32数据类型。
+- 寒武纪中 tensor.to(device) 的 tensor 不支持uint64或者是int64数据类型
 
 ### 
