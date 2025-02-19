@@ -2,7 +2,7 @@
 # `Softmax`
 
 $\bullet$ `Softmax` 对张量做指数变换，进而做归一化得到另一个张量。    
-$\bullet$ 对于长度为 $N$ 的一维张量 $x$ ，数学变换为：$ y_i = \frac{e^{x_i}}{\sum_{i=0}^{N - 1} e^{x_i}} $ 。    
+$\bullet$ 对于长度为 $N$ 的一维张量 $x$ ，数学变换为：$y_i = \frac{e^{x_i}}{\sum_{i=0}^{N - 1} e^{x_i}}$ 。    
 $\bullet$ 高维张量的 softmax 只需要在指定 axis 做上述数学变换即可。例如，形状为 $[N,C,H,W]$ 的四维向量 $x$ ，axis = 1，对应数学变换如下所示：
 
 $$ y_{i,j,k,s} = \frac{e^{x_{i,j,k,s}}}{\sum_{j=0}^{C - 1} e^{x_{i,j,k,s}}} $$
