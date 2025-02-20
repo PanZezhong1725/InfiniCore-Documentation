@@ -134,14 +134,14 @@ infiniopStatus_t infiniopCreateRoPEDescriptor(
 
 ```c
 infiniopStatus_t infiniopGetRoPEWorkspaceSize(
-	infiniopRandomSampleDescriptor_t desc,
+	infiniopRoPEDescriptor_t desc,
 	uint64_t *size
 );
 ```
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
  - `desc`
-	 : 输入。已使用 `infiniopCreateRandomSampleDescriptor()` 初始化的算子描述符。 
+	 : 输入。已使用 `infiniopCreateRoPEDescriptor()` 初始化的算子描述符。 
  - `size`
 	 : 输出。Host 指针，额外空间大小的计算结果的写入地址。
 
@@ -155,7 +155,7 @@ infiniopStatus_t infiniopGetRoPEWorkspaceSize(
 
 ```c
 infiniopStatus_t infiniopDestroyRoPEDescriptor(
-	infiniopRandomSampleDescriptor_t desc
+	infiniopRoPEDescriptor_t desc
 );
 ```
 
