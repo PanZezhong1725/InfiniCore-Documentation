@@ -3,8 +3,9 @@
 
 `Rotary Position Embedding`, 即**旋转位置编码**算子：
 
-旋转频率（`theta`）
+旋转频率（$\theta$）
 - 计算公式为：
+
   $$
   \theta_{i} = \text{base}^{\frac{-2i}{d}}
   $$
@@ -14,9 +15,10 @@
   - `i`：当前嵌入维度的索引。
   - `d` ：嵌入的总维度。
   
-每个token的嵌入向量的旋转变换，对于第`k`个维度（每个token的两个部分）：
+每个 token 的嵌入向量的旋转变换，对于第`k`个维度（每个token的两个部分）：
 
 - **获取原始嵌入**：
+
   $$ 
   a = \text{t[2k]}
   $$ 
@@ -25,6 +27,7 @@
   $$ 
 
 - **获取对应位置的正弦和余弦值**：
+
   $$ 
   \sin_0 = \sin[2k], \quad \cos_0 = \cos[2k]
   $$ 
@@ -33,6 +36,7 @@
   $$ 
 
 - **旋转嵌入向量**：
+
   $$ 
   t[2k] = a \cdot \cos_0 - b \cdot \sin_0
   $$ 
@@ -52,7 +56,8 @@ infiniopStatus_t infiniopRoPE(
     void const *pos_ids,
     void const *sin_table,
     void const *cos_table,
-    void *stream);
+    void *stream
+    );
 ```
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
 
@@ -65,11 +70,11 @@ infiniopStatus_t infiniopRoPE(
  - `t`
 	 : 输入输出（比如attention层中的query或key）张量数据指针。
  - `pos_ids`
-	 : 输入。位置数值张量指针，代表data中每个向量对应的cos、sin表中的序号。计算时，会根据序号选择表中的数值进行位置编码。用户应自行保证序号不会超过cos、sin表的长度。
+	 : 输入。位置数值张量常量指针，代表data中每个向量对应的cos、sin表中的序号。计算时，会根据序号选择表中的数值进行位置编码。用户应自行保证序号不会超过cos、sin表的长度。
  - `sin_table`
-	 : sin表指针。
+	 : sin表常量指针。
  - `cos_table`
-	 : cos表指针。 
+	 : cos表常量指针。 
 
  - `stream`
 	 : 输入。计算流/队列。
@@ -93,7 +98,8 @@ infiniopStatus_t infiniopCreateRoPEDescriptor(
     infiniopTensorDescriptor_t t,
     infiniopTensorDescriptor_t pos_ids,
     infiniopTensorDescriptor_t sin_table,
-    infiniopTensorDescriptor_t cos_table);
+    infiniopTensorDescriptor_t cos_table
+    );
 ```
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
@@ -101,14 +107,14 @@ infiniopStatus_t infiniopCreateRoPEDescriptor(
 	: 输入。`infiniopHandle_t` 类型的硬件控柄。详情请看：[InfiniopHandle_t]()
  - `desc_ptr`
 	 : 输出。Host `infiniopRoPEDescriptor_t` 指针，指向将被初始化的算子描述符地址。
- - `t` - { dT }
+ - `t` - { dT | (seq_len, num_head, head_dim) | (..., 1) }
 	 : 输入（同时也是输出）张量描述。张量必须为三维：(seq_len, num_head, head_dim)。最后一维数据必须连续，即步长为1，且长度（head_dim）为2的倍数。
- - `pos_ids` - { dI }
+ - `pos_ids` - { dI | (seq_len) | (~) }
 	 : 输入。位置信息张量描述。张量必须为一维连续张量，长度为seq_len。用户需自行保证位置数据中所有数值小于max_seq_len。
- - `sin_table` - { dT }
+ - `sin_table` - { dT | (max_seq_len, head_dim/2) | (~) }
 	 : 输入。sin值表的张量描述，二维连续张量，形状为 (max_seq_len, head_dim/2)。
    
- - `cos_table` - { dT }
+ - `cos_table` - { dT | (max_seq_len, head_dim/2) | (~) }
 	 : 输入。cos值表的张量描述，要求与sin表相同。 
 
 参数限制：
