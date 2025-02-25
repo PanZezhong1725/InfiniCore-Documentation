@@ -3,12 +3,12 @@
 
 `Rotary Position Embedding`, 即**旋转位置编码**算子：
 
-旋转频率（ $\theta$ ）
+旋转频率 ( $\theta$ )  
 - 计算公式为：
- 
-  $$
-  \theta_{i} = \text{base}^{\frac{-2i}{d}}
-  $$
+
+$$
+\theta_{i} = \text{base}^{\frac{-2i}{d}}
+$$
 
   其中：
   - `base`：控制旋转速率的超参数，通常为 `base` = 10000。
