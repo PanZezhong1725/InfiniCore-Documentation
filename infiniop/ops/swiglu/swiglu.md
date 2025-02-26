@@ -88,7 +88,7 @@ infiniopStatus_t infiniopCreateSwiGLUDescriptor(
 ### 销毁算子描述符
 
 ```c
-infiniopStatus_t infiniopDestroyRoPEDescriptor(
+infiniopStatus_t infiniopDestroySwiGLUDescriptor(
 	infiniopSwiGLUDescriptor_t desc
 );
 ```
