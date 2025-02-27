@@ -75,7 +75,7 @@ infiniopStatus_t infiniopRoPE(
  - `sin_table`
 	 : sin 表常量指针。张量限制见[创建算子描述](#创建算子描述)部分。
  - `cos_table`
-	 : cos 表常量指针。 张量限制见[创建算子描述](#创建算子描述)部分。
+	 : cos 表常量指针。张量限制见[创建算子描述](#创建算子描述)部分。
 
  - `stream`
 	 : 输入。计算流/队列。
@@ -111,7 +111,7 @@ infiniopStatus_t infiniopCreateRoPEDescriptor(
  - `t` - { dT | `(seq_len, num_head, head_dim)` | (..., 1) }
 	 : 输入（同时也是输出）张量描述。张量必须为三维：`(seq_len, num_head, head_dim)`。最后一维数据必须连续，即步长为1，且长度`(head_dim)` 为2的倍数。
  - `pos_ids` - { dI | `(seq_len)` | (~) }
-	 : 输入。位置信息张量描述。张量必须为一维连续张量，长度为 seq_len 。用户需自行保证位置数据中所有数值小于 max_seq_len 。
+	 : 输入。位置信息张量描述。张量必须为一维连续张量，长度为 `seq_len` 。用户需自行保证位置数据中所有数值小于 `max_seq_len` 。
  - `sin_table` - { dT | `(max_seq_len, head_dim/2)` | (~) }
 	 : 输入。sin 值表的张量描述，二维连续张量，形状为 `(max_seq_len, head_dim/2)` 。
    
