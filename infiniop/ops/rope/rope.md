@@ -54,9 +54,9 @@ infiniopStatus_t infiniopRoPE(
     void *workspace,
     uint64_t workspace_size,
     void *t,
-    void const *pos_ids,
-    void const *sin_table,
-    void const *cos_table,
+    const void *pos_ids,
+    const void *sin_table,
+    const void *cos_table,
     void *stream
 );
 ```
