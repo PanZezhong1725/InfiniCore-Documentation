@@ -1,8 +1,8 @@
 
 # `Causal Softmax`
 
-$\bullet$ `Causal Softmax` 是使用causal mask的softmax函数，其中指数变换的操作维度限定在最后一维，适用于各类因果类模型。     
-$\bullet$ 在`Softmax` 的基础上引入 mask，对于形状为 $[s_0,\ldots, s_{r-1}]$ 的输入张量 $x$ 来说，mask = $s_{r - 1} - s_{r - 2} \geq 0$。    
+$\bullet$ `Causal Softmax` 是使用 causal mask 的 softmax 函数，其中指数变换的操作维度限定在最后一维，适用于各类因果类模型。     
+$\bullet$ 在 `Softmax` 的基础上引入 mask ，对于形状为 $[s_0,\ldots, s_{r-1}]$ 的输入张量 $x$ 来说，mask = $s_{r - 1} - s_{r - 2} \geq 0$ 。    
 $\bullet$ 以形状为 $[4, 7]$ 的张量 $x$ 举例，mask 变换如下所示：
 
 
@@ -19,7 +19,8 @@ $$ \left[\begin{gathered}
      x_{3,0} & x_{3,1} & x_{3, 2} & x_{3, 3} & x_{3, 4} & x_{3,5} & x_{3, 6}
     \end{gathered}\right] $$
 
-$\bullet$ 经过mask变换以后针对最后一维做 softmax 变换即可。  
+$\bullet$ 经过 mask 变换以后针对最后一维做 softmax 变换即可，一维向量的 softmax 变换参考：
+$$ y_i = \frac{e^{x_i}}{\sum_{i=0}^{N - 1} e^{x_i}} $$  
 $\bullet$ 高维向量的 `Causal Softmax` 只需要考虑最后两维即可。
 
 
@@ -33,7 +34,7 @@ infiniopStatus_t infiniopCausalSoftmax(
     infiniopCausalSoftmaxDescriptor_t desc, 
     void *workspace, 
     uint64_t workspace_size, 
-    void* data, 
+    void *data, 
     void *stream
 );
 ```
@@ -46,10 +47,13 @@ infiniopStatus_t infiniopCausalSoftmax(
  - `workspace_size`   
 	 : 输入。`workspace` 的大小，单位：字节（byte）。
  - `data`      
-     : 既是输入，也是输出。Device 常量指针，仅支持原地计算，张量限制见[创建算子描述](#创建算子描述)部分。
+     : 既是输入，也是输出。Device 指针，仅支持原地计算，张量限制见[创建算子描述](#创建算子描述)部分。
  - `stream`    
      : 输入。计算流/队列。
 
+参数限制：
+
+ - `data` 仅支持原地计算。
 
 <div style="background-color: lightblue; padding: 1px;">  返回值：</div>
 
@@ -73,13 +77,13 @@ infiniopStatus_t infiniopCreateCausalSoftmaxDescriptor(
      : 输入。`infiniopHandle_t` 类型的硬件控柄。详情请看：[InfiniopHandle_t]()
  - `desc_ptr`    
      : 输出。Host `infiniopCausalSoftmaxDescriptor_t` 指针，指向将被初始化的算子描述符地址。
- - `t_desc` - {dT}       
-     : 输入。算子计算参数 `t_desc` 的张量描述，数据为$r$维张量，其中$r \geq 2$。
+ - `t_desc` - { dT | ($\ldots$) | ($\ldots,1$) }       
+     : 输入。算子计算参数 `t_desc` 的张量描述，数据为 $r$ 维张量，其中 $r \geq 2$ 。
 
 参数限制：
 
  - **`dT`**:  (`Float16`, `Float32`, `Double`, `Bfloat16`) 之一
- - 支持不连续步长
+ - `t_desc` 支持不连续步长
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
@@ -129,6 +133,6 @@ infiniopStatus_t infiniopDestroyCausalSoftmaxDescriptor(
 
 ### 平台限制
 
-- 寒武纪中 tensor.to(device) 的 tensor 不支持uint64或者是int64数据类型
+- 寒武纪中 tensor.to(device) 的 tensor 不支持 uint64 或者是 int64 数据类型
 
 ### 

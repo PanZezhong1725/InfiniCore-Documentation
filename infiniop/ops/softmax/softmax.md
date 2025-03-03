@@ -31,17 +31,17 @@ infiniopStatus_t infiniopCreateSoftmaxDescriptor(
      : 输入。`infiniopHandle_t` 类型的硬件控柄。详情请看：[InfiniopHandle_t]()
  - `desc_ptr`    
      : 输出。Host `infiniopSoftmaxDescriptor_t` 指针，指向将被初始化的算子描述符地址。
- - `input_desc` - {dT}          
-     : 输入。算子计算参数 `input_desc` 的张量描述，数据为 $r$维张量，其中 $r$ 是任意正整数。
+ - `input_desc` - { dT | ($\ldots$) | ($\ldots$) }       
+     : 输入。算子计算参数 `input_desc` 的张量描述，数据为 $r$  维张量，其中 $r$ 是任意正整数。
  - `axis` ：int      
-     : 输入。默认值是-1，可选择范围是 $[-r, r - 1]$。
- - `output_desc` - {dT}      
+     : 输入。默认值是 -1 ，可选择范围是 $[-r, r - 1]$ 。
+ - `output_desc` - { dT | ($\ldots$) | ($\ldots$) }      
      : 输入。算子计算参数 `output_desc` 的张量描述，张量形状和 `input_desc` 保持一致。
 
 参数限制：
 
  - **`dT`**:  (`Float16`, `Float32`, `Double`, `Bfloat16`) 之一。
- - 支持不连续步长。
+ - `input_desc` 和 `output_desc` 都支持不连续步长。
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
@@ -54,9 +54,9 @@ infiniopStatus_t infiniopCreateSoftmaxDescriptor(
 ```c
 infiniopStatus_t infiniopSoftmax(
     infiniopSoftmaxDescriptor_t desc, 
-    void* const input, 
-    void* output, 
-    void* stream
+    const void *input, 
+    void *output, 
+    void *stream
 );
 ```
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
@@ -98,6 +98,6 @@ infiniopStatus_t infiniopDestroySoftmaxDescriptor(
 
 ### 平台限制
 
-- 寒武纪中 tensor.to(device) 的 tensor 不支持uint64或者是int64数据类型。
+- 寒武纪中 tensor.to(device) 的 tensor 不支持 uint64 或者是 int64 数据类型。
 
 ### 
