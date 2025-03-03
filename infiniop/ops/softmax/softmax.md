@@ -14,41 +14,6 @@ $$ y_{i,j,k,s} = \frac{e^{x_{i,j,k,s}}}{\sum_{j=0}^{C - 1} e^{x_{i,j,k,s}}} $$
 
 ## 接口
 
-### 创建算子描述
-
-```c
-infiniopStatus_t infiniopCreateSoftmaxDescriptor(
-    infiniopHandle_t handle, 
-    infiniopSoftmaxDescriptor_t *desc_ptr, 
-    infiniopTensorDescriptor_t input_desc, 
-    int axis, 
-    infiniopTensorDescriptor_t output_desc
-);
-```
-<div style="background-color: lightblue; padding: 1px;"> 参数：</div>
-
- - `handle`    
-     : 输入。`infiniopHandle_t` 类型的硬件控柄。详情请看：[InfiniopHandle_t]()
- - `desc_ptr`    
-     : 输出。Host `infiniopSoftmaxDescriptor_t` 指针，指向将被初始化的算子描述符地址。
- - `input_desc` - { dT | ($\ldots$) | ($\ldots$) }       
-     : 输入。算子计算参数 `input_desc` 的张量描述，数据为 $r$  维张量，其中 $r$ 是任意正整数。
- - `axis` ：int      
-     : 输入。默认值是 -1 ，可选择范围是 $[-r, r - 1]$ 。
- - `output_desc` - { dT | ($\ldots$) | ($\ldots$) }      
-     : 输入。算子计算参数 `output_desc` 的张量描述，张量形状和 `input_desc` 保持一致。
-
-参数限制：
-
- - **`dT`**:  (`Float16`, `Float32`, `Double`, `Bfloat16`) 之一。
- - `input_desc` 和 `output_desc` 都支持不连续步长。
-
-<div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
-
- - [`INFINIOP_STATUS_SUCCESS`](), [`INFINIOP_STATUS_BAD_PARAM`](),  [`INFINIOP_STATUS_BAD_TENSOR_SHAPE`](), [`INFINIOP_STATUS_BAD_TENSOR_DTYPE`](), [`INFINIOP_STATUS_BAD_TENSOR_STRIDES`](), [`INFINIOP_STATUS_BAD_DEVICE`]().
-
----
-
 ### 计算
 
 ```c
@@ -76,6 +41,42 @@ infiniopStatus_t infiniopSoftmax(
 
 
 ---
+
+### 创建算子描述
+
+```c
+infiniopStatus_t infiniopCreateSoftmaxDescriptor(
+    infiniopHandle_t handle, 
+    infiniopSoftmaxDescriptor_t *desc_ptr, 
+    infiniopTensorDescriptor_t input_desc, 
+    int axis, 
+    infiniopTensorDescriptor_t output_desc
+);
+```
+<div style="background-color: lightblue; padding: 1px;"> 参数：</div>
+
+ - `handle`    
+     : 输入。`infiniopHandle_t` 类型的硬件控柄。详情请看：[InfiniopHandle_t]()
+ - `desc_ptr`    
+     : 输出。Host `infiniopSoftmaxDescriptor_t` 指针，指向将被初始化的算子描述符地址。
+ - `input_desc` - { dT | ($\ldots$) | ($\ldots$) }       
+     : 输入。算子计算参数 `input_desc` 的张量描述，数据为 $r$  维张量，其中 $r$ 是任意正整数。
+ - `axis` ：int      
+     : 输入。默认值是 -1 ，表示操作维度是最后一维，可选择范围是 $[-r, r - 1]$ 。
+ - `output_desc` - { dT | ($\ldots$) | ($\ldots$) }      
+     : 输入。算子计算参数 `output_desc` 的张量描述，张量形状和 `input_desc` 保持一致。
+
+参数限制：
+
+ - **`dT`**:  (`Float16`, `Float32`, `Double`, `Bfloat16`) 之一。
+ - `input_desc` 和 `output_desc` 都支持不连续步长。
+
+<div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
+
+ - [`INFINIOP_STATUS_SUCCESS`](), [`INFINIOP_STATUS_BAD_PARAM`](),  [`INFINIOP_STATUS_BAD_TENSOR_SHAPE`](), [`INFINIOP_STATUS_BAD_TENSOR_DTYPE`](), [`INFINIOP_STATUS_BAD_TENSOR_STRIDES`](), [`INFINIOP_STATUS_BAD_DEVICE`]().
+
+---
+
 
 ### 销毁算子描述符
 
