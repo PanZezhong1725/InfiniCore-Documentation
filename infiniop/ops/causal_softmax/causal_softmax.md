@@ -20,7 +20,9 @@ $$ \left[\begin{gathered}
     \end{gathered}\right] $$
 
 $\bullet$ 经过 mask 变换以后针对最后一维做 softmax 变换即可，一维向量的 softmax 变换参考：
+
 $$ y_i = \frac{e^{x_i}}{\sum_{i=0}^{N - 1} e^{x_i}} $$  
+
 $\bullet$ 高维向量的 `Causal Softmax` 只需要考虑最后两维即可。
 
 
