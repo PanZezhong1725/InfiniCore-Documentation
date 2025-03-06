@@ -35,7 +35,7 @@ $\bullet$ 高维向量的 `Causal Softmax` 只需要考虑最后两维即可。
 infiniopStatus_t infiniopCausalSoftmax(
     infiniopCausalSoftmaxDescriptor_t desc, 
     void *workspace, 
-    uint64_t workspace_size, 
+    size_t workspace_size, 
     void *data, 
     void *stream
 );
@@ -98,7 +98,7 @@ infiniopStatus_t infiniopCreateCausalSoftmaxDescriptor(
 ```c
 infiniopStatus_t infiniopGetCausalSoftmaxWorkspaceSize(
     infiniopCausalSoftmaxDescriptor_t desc, 
-    uint64_t *size
+    size_t *size
 );
 ```
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>

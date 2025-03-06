@@ -19,8 +19,8 @@ $$ y_{i,j,k,s} = \frac{e^{x_{i,j,k,s}}}{\sum_{j=0}^{C - 1} e^{x_{i,j,k,s}}} $$
 ```c
 infiniopStatus_t infiniopSoftmax(
     infiniopSoftmaxDescriptor_t desc, 
-    const void *input, 
     void *output, 
+    const void *input, 
     void *stream
 );
 ```
@@ -48,9 +48,9 @@ infiniopStatus_t infiniopSoftmax(
 infiniopStatus_t infiniopCreateSoftmaxDescriptor(
     infiniopHandle_t handle, 
     infiniopSoftmaxDescriptor_t *desc_ptr, 
+    infiniopTensorDescriptor_t output_desc,
     infiniopTensorDescriptor_t input_desc, 
-    int axis, 
-    infiniopTensorDescriptor_t output_desc
+    int axis
 );
 ```
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
