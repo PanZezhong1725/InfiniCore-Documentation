@@ -1,21 +1,20 @@
-# `Switched Gated Linear Unit`
 
-`Switched Gated Linear Unit`, 即**门控线性单元激活函数**算子：
+# `SwiGLU`
 
-- 计算公式为：
-
-$$
-c_{i}=    a_{i}\circ SiLU(b_{i})
-$$
+`SwiGLU (Switched Gated Linear Unit)`, 即**门控线性单元激活函数**算子，计算公式为：
 
 $$
-SiLU(b_{i}) = \frac{b_{i}}{1+e^{-b_{i}}}
+c_{i} = a_{i} \circ SiLU(b_{i})
+$$
+
+$$
+SiLU(b_{i}) = \frac {b_{i}}{1 + e^{-b_{i}}}
 $$
 
   其中：
-  - `c_{i}`：输出张量第`i`个元素
-  - `a_{i}`：输入张量第`i`个元素
-  - `b_{i}` ：门控输入张量第`i`个元素
+  - `c_{i}`：输出张量第 `i` 个元素
+  - `a_{i}`：输入张量第 `i` 个元素
+  - `b_{i}` ：门控输入张量第 `i` 个元素
   
 
 ## 接口
@@ -24,11 +23,11 @@ $$
 
 ```c
 infiniopStatus_t infiniopSwiGLU(
-	infiniopSwiGLUDescriptor_t desc,
-    void *c,
-    void* const a,
-    void* const b,
-    void* stream
+  infiniopSwiGLUDescriptor_t desc,
+  void *c,
+  const void *a,
+  const void *b,
+  void* stream
 );
 ```
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
@@ -67,17 +66,17 @@ infiniopStatus_t infiniopCreateSwiGLUDescriptor(
 	: 输入。`infiniopHandle_t` 类型的硬件控柄。详情请看：[InfiniopHandle_t]()
  - `desc_ptr`
 	 : 输出。Host `infiniopSwiGLUDescriptor_t` 指针，指向将被初始化的算子描述符地址。
- - `c` - {dT}
-	 : 输出。输出。 算子计算参数 `c` 的张量描述。
- - `a` - {dT}
-	 : 输入。输入。 算子计算参数 `a` 的张量描述。
- - `b` - {dT}
-	 : 输入。输入。 算子计算参数 `b` 的张量描述。
+ - `c` - {dT|(...)|(...)}
+	 : 输出。算子计算参数 `c` 的张量描述, 支持原位计算。
+ - `a` - {dT|(...)|(...)}
+	 : 输入。算子计算参数 `a` 的张量描述，支持原位计算。
+ - `b` - {dT|(...)|(...)}
+	 : 输入。算子计算参数 `b` 的张量描述，支持原位计算。
 
 参数限制：
 
  - **`dT`**:  (`Float16`, `Float32`, `Double`, `Bfloat16`) 之一
- - 支持不连续步长
+ - `c`, `a`, `b` 支持不连续步长
     
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
