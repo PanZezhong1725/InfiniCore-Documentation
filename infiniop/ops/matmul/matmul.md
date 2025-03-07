@@ -7,13 +7,13 @@ $$ C = α ⋅ (A * B) + β ⋅ C $$
 
 其中：
 
-A 为左输入张量，形状为( [batch,] M, K ) ;
+`A` 为左输入张量，形状为`( [batch,] M, K )` ;
 
-B 为右输入张量，形状为( [batch,] K, N ) ;
+`B` 为右输入张量，形状为`( [batch,] K, N )` ;
 
-C 的形状由矩阵乘法规则确定，形状为( [batch,] M, N ) ;
+`C` 的形状由矩阵乘法规则确定，形状为`( [batch,] M, N )` ;
 
-α 为缩放因子，β 为累加系数。
+`α` 为缩放因子，`β` 为累加系数。
 
 ## 接口
 
@@ -25,8 +25,8 @@ infiniopStatus_t infiniopMatmul(
     void *workspace,
     uint64_t workspace_size,
     void *c,
-    void const *a,
-    void const *b,
+    const void  *a,
+    const void  *b,
     void *stream
 );
 ```
@@ -54,7 +54,7 @@ infiniopStatus_t infiniopMatmul(
 
 ---
 
-### 创建算子描述符
+### 创建算子描述
 
 ```c
 infiniopStatus_t infiniopCreateMatmulDescriptor(
@@ -76,18 +76,27 @@ infiniopStatus_t infiniopCreateMatmulDescriptor(
 	 : 输出。Host `infiniopCreateMatmulDescriptor` 指针，指向将被初始化的算子描述符地址。
  - `c_desc` - { dT | ( [batch,] , M, N) | (~) }
 	 : 输出。 算子计算参数 `c` 的张量描述。
- - `alpha` - { dT | 标量 }
+ - `alpha` - float
 	 : 输入。 算子计算缩放因子。
  - `a_desc` - { dT | ( [batch,] , M, K) | (~) }
 	 : 输入。 算子计算参数 `a` 的张量描述。
  - `b_desc` - { dT | ( [batch,] , K, N) | (~) }
 	 : 输入。 算子计算参数 `b` 的张量描述。
- - `beta` - { dT | 标量 }
+ - `beta` - float
 	 : 输入。 算子计算累加系数。
 <div style="background-color: lightblue; padding: 1px;"> 参数限制：</div>
 
- - `dT`
-	 : (`Float16`, `Float32`) 之一
+参数限制：
+
+ - **`dT`**:  (`Float16`, `Float32`) 之一
+ 
+ - **`[batch,]`**: `batch ≥ 1` （可选）
+    
+ - **`M`**: M > 0
+
+ - **`N`**: N > 0
+
+ - **`K`**: K > 0
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
@@ -132,3 +141,6 @@ infiniopStatus_t infiniopDestroyMatmulDescriptor(
 <div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
 
  - [`INFINIOP_STATUS_SUCCESS`](), [`INFINIOP_STATUS_BAD_DEVICE`]().
+
+ ## 已知问题
+
