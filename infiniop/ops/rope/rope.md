@@ -69,7 +69,7 @@ infiniopStatus_t infiniopRoPE(
  - `workspace_size`
 	 : 输入。`workspace` 的大小，单位：字节（byte）。
  - `t`
-	 : 输入输出（比如 attention 层中的 query 或 key）张量数据指针。张量限制见[创建算子描述](#创建算子描述)部分。
+	 : 输入输出（比如 attention 层中的 query 或 key）张量数据 Device 指针。张量限制见[创建算子描述](#创建算子描述)部分。
  - `pos_ids`
 	 : 输入。位置数值张量 Device 常量指针，代表 data 中每个向量对应的 cos、sin 表中的序号。计算时，会根据序号选择表中的数值进行位置编码。用户应自行保证序号不会超过 cos、sin 表的长度。张量限制见[创建算子描述](#创建算子描述)部分。
  - `sin_table`
