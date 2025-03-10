@@ -51,13 +51,13 @@ infiniopStatus_t infiniopRandomSample(
 - `probs`:
   输入。Device 常量指针，概率分布数据。张量限制见[创建算子描述](#创建算子描述)部分；
 - `random_val`:
-  输入。随机数种子，一般通过 Uniform 分布产生，范围是 $[0,1]$ ；
+  输入。随机数种子，一般通过 Uniform 分布产生，范围是 $[0,1]$；
 - `topp`:
-  输入。top-p 采样阈值，使得采样只从靠前的概率和为 `topp` 的范围内进行，范围是 $[0,1]$ 。当 `topp` 为0时，采样退化为 **Argmax** 算子。当 `topp` 大于等于1时，不设置 top-p 阈值；
+  输入。top-p 采样阈值，使得采样只从靠前的概率和为 `topp` 的范围内进行，范围是 $[0,1]$。当 `topp` 为0时，采样退化为 **Argmax** 算子。当 `topp` 大于等于1时，不设置 top-p 阈值；
 - `topk`:
-  输入。top-k 采样阈值，使得采样只从靠前的 `topk` 项里进行，范围是 $[0,\infty)$ 。当 `topk` 为1时，采样退化为 **Argmax** 算子；当 `topk` 大于等于概率分布长度或为0时，不设置 top-k 阈值；
+  输入。top-k 采样阈值，使得采样只从靠前的 `topk` 项里进行，范围是 $[0,\infty)$。当 `topk` 为1时，采样退化为 **Argmax** 算子；当 `topk` 大于等于概率分布长度或为0时，不设置 top-k 阈值；
 - `temperature`:
-  输入。概率分布随机性度，范围是 $[0,\infty)$ 。
+  输入。概率分布随机性度，范围是 $[0,\infty)$。
   - 当 `temperature` 为1时，采样结果与原始概率分布一致；
   - 当 `temperature` 大于1时，采样结果越靠近原始概率分布，越可能被选中；
   - 当 `temperature` 小于1时，采样结果越远离原始概率分布，越可能被选中；
@@ -69,8 +69,6 @@ infiniopStatus_t infiniopRandomSample(
 
 - 当 `random_val`、`topp`、`topk`、或 `temperature` 超出范围返回 [`INFINIOP_STATUS_BAD_PARAM`]；
 - [`INFINIOP_STATUS_SUCCESS`], [`INFINIOP_STATUS_BAD_PARAM`], [`INFINIOP_STATUS_INSUFFICIENT_WORKSPACE`], [`INFINIOP_STATUS_BAD_DEVICE`], [`INFINIOP_STATUS_EXECUTION_FAILED`].
-
----
 
 ### 创建算子描述
 
@@ -89,24 +87,20 @@ infiniopStatus_t infiniopCreateRandomSampleDescriptor(
   输入。`infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]；
 - `desc_ptr`:
   输出。Host `infiniopRandomSampleDescriptor_t` 指针，指向将被初始化的算子描述符地址；
-- `result` - ${ dOut | (1,) | (1,) }$ :
+- `result` - ${ dOut | (1,) | (1,) }$:
   输入。 算子计算参数 `result` 的张量描述；
-- `probs` - ${ dT | (N,) | (1,) }$ :
+- `probs` - ${ dT | (N,) | (1,) }$:
   输入。算子计算参数 `probs` 的张量描述。目前仅支持连续一维张量；
 
 参数限制：
 
 - `dT`: `Float16` 或 `Float32`；
-
 - `dOut`: `Uint64`；
-
 - `N`: N > 0；
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
 - [`INFINIOP_STATUS_SUCCESS`], [`INFINIOP_STATUS_BAD_PARAM`], [`INFINIOP_STATUS_BAD_TENSOR_SHAPE`], [`INFINIOP_STATUS_BAD_TENSOR_DTYPE`], [`INFINIOP_STATUS_BAD_TENSOR_STRIDES`], [`INFINIOP_STATUS_BAD_DEVICE`].
-
----
 
 ### 计算额外工作空间
 
@@ -120,15 +114,13 @@ infiniopStatus_t infiniopGetRandomSampleWorkspaceSize(
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
 - `desc`:
-  输入。已使用 `infiniopCreateRandomSampleDescriptor()` 初始化的算子描述符。
+  输入。已使用 `infiniopCreateRandomSampleDescriptor()` 初始化的算子描述符；
 - `size`:
-  输出。Host 指针，额外空间大小的计算结果的写入地址。
+  输出。Host 指针，额外空间大小的计算结果的写入地址；
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
 - [`INFINIOP_STATUS_SUCCESS`], [`INFINIOP_STATUS_BAD_PARAM`], [`INFINIOP_STATUS_BAD_DEVICE`].
-
----
 
 ### 销毁算子描述符
 
@@ -141,7 +133,7 @@ infiniopStatus_t infiniopDestroyRandomSampleDescriptor(
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
 
 - `desc`:
-  输入。 待销毁的算子描述符。
+  输入。 待销毁的算子描述符；
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
 
