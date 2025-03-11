@@ -18,7 +18,7 @@ src:
     d_3, e_4, f_5\\
     \end{gathered}
 \right)
-\xrightarrow{transpose}
+\stackrel{T}{\rightarrow}
 dst:
 \left(
     \begin{gathered}
@@ -39,7 +39,7 @@ src:
     d_3, e_4, f_5\\
     \end{gathered}
 \right)
-\xrightarrow{transpose(meta)}
+\stackrel{T_{meta}}{\rightarrow}
 \left(
     \begin{gathered}
     a_0, d_3\\
@@ -47,7 +47,7 @@ src:
     c_2, f_5\\
     \end{gathered}
 \right)
-\xrightarrow{rearrange}
+\stackrel{R}{\rightarrow}
 dst:
 \left(
     \begin{gathered}
@@ -58,8 +58,11 @@ dst:
 \right)
 $$
 
-1. $transpose(meta)$: 不改变数据在存储空间中的排布，但将形状从 $2 \times 3$ 改为 $3 \times 2$，步长从 $1,3$ 改为 $3,1$；
-2. $rearrange$: 调用算子 $rearrange(shape=(3,2), strides_{dst}=(1,2),strides_{src}=(3,1))$；
+| 操作 | 解释
+|:-:|:-
+| $T$ | 转置，既转置形状布局，也移动数据位置
+| $T_{meta}$ | 不改变数据在存储空间中的排布，但将形状从 $2 \times 3$ 改为 $3 \times 2$，步长从 $1,3$ 改为 $3,1$
+| $R$ | 调用算子 $rearrange(shape=(3,2), strides_{dst}=(1,2),strides_{src}=(3,1))$
 
 ## 接口
 
