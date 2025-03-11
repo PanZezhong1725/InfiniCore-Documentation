@@ -1,9 +1,9 @@
 
 # `Causal Softmax`
 
-$\bullet$ `Causal Softmax` 是使用 causal mask 的 softmax 函数，其中指数变换的操作维度限定在最后一维，适用于各类因果类模型。     
-$\bullet$ 在 `Softmax` 的基础上引入 mask ，对于形状为 $[s_0,\ldots, s_{r-1}]$ 的输入张量 $x$ 来说，mask = $s_{r - 1} - s_{r - 2} \geq 0$ 。    
-$\bullet$ 以形状为 $[4, 7]$ 的张量 $x$ 举例，mask 变换如下所示：
+`Causal Softmax` 是使用 causal mask 的 softmax 函数，其中指数变换的操作维度限定在最后一维，适用于各类因果类模型。     
+在 `Softmax` 的基础上引入 mask ，对于形状为 $[s_0,\ldots, s_{r-1}]$ 的输入张量 $x$ 来说，mask = $s_{r - 1} - s_{r - 2} \geq 0$ 。    
+以形状为 $[4, 7]$ 的张量 $x$ 举例，mask 变换如下所示：
 
 
 $$ \left[\begin{gathered}
@@ -19,11 +19,11 @@ $$ \left[\begin{gathered}
      x_{3,0} & x_{3,1} & x_{3, 2} & x_{3, 3} & x_{3, 4} & x_{3,5} & x_{3, 6}
     \end{gathered}\right] $$
 
-$\bullet$ 经过 mask 变换以后针对最后一维做 softmax 变换即可，一维向量的 softmax 变换参考：
+经过 mask 变换以后针对最后一维做 softmax 变换即可，一维向量的 softmax 变换参考：
 
 $$ y_i = \frac{e^{x_i}}{\sum_{i=0}^{N - 1} e^{x_i}} $$  
 
-$\bullet$ 高维向量的 `Causal Softmax` 只需要考虑最后两维即可。
+高维向量的 `Causal Softmax` 只需要考虑最后两维即可。
 
 
 
