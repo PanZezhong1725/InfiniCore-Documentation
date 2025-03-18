@@ -87,7 +87,7 @@ infiniopStatus_t infiniopCreateRandomSampleDescriptor(
   输入。`infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]；
 - `desc_ptr`:
   输出。Host `infiniopRandomSampleDescriptor_t` 指针，指向将被初始化的算子描述符地址；
-- `result` - ${ dOut | (1,) | (1,) }$:
+- `result` - ${ dOut | (,) | (,) }$:
   输入。 算子计算参数 `result` 的张量描述；
 - `probs` - ${ dT | (N,) | (1,) }$:
   输入。算子计算参数 `probs` 的张量描述。目前仅支持连续一维张量；
