@@ -20,10 +20,10 @@ $$
 ### 计算
 
 ```c
-infiniopStatus_t infiniopRMSNorm(
+infiniStatus_t infiniopRMSNorm(
     infiniopRMSNormDescriptor_t desc,
     void *workspace,
-    uint64_t workspace_size,
+    size_t workspace_size,
     void *y,
     const void *x,
     const void *w,
@@ -46,18 +46,18 @@ infiniopStatus_t infiniopRMSNorm(
 - `w`:
   权重数据地址（可选）。如果权重张量为 `NULL`，则不进行缩放；
 - `stream`:
-  输入。计算流/队列；
+  计算流/队列；
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
-- [`INFINIOP_STATUS_SUCCESS`], [`INFINIOP_STATUS_BAD_PARAM`], [`INFINIOP_STATUS_INSUFFICIENT_WORKSPACE`], [`INFINIOP_STATUS_BAD_DEVICE`], [`INFINIOP_STATUS_EXECUTION_FAILED`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_INSUFFICIENT_WORKSPACE`], [`INFINI_STATUS_BAD_DEVICE`], [`INFINI_STATUS_EXECUTION_FAILED`].
 
-- 当 `epsilon` 超出范围时返回 [`INFINIOP_STATUS_BAD_PARAM`]；
+- 当 `epsilon` 超出范围时返回 [`INFINI_STATUS_BAD_PARAM`]；
 
 ### 创建算子描述
 
 ```c
-infiniopStatus_t infiniopCreateRMSNormDescriptor(
+infiniStatus_t infiniopCreateRMSNormDescriptor(
     infiniopHandle_t handle,
     infiniopRMSNormDescriptor_t *desc_ptr,
     infiniopTensorDescriptor_t y_desc,
@@ -89,14 +89,14 @@ infiniopStatus_t infiniopCreateRMSNormDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
-- [`INFINIOP_STATUS_SUCCESS`], [`INFINIOP_STATUS_BAD_PARAM`], [`INFINIOP_STATUS_BAD_TENSOR_SHAPE`], [`INFINIOP_STATUS_BAD_TENSOR_DTYPE`], [`INFINIOP_STATUS_BAD_TENSOR_STRIDES`], [`INFINIOP_STATUS_BAD_DEVICE`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_BAD_TENSOR_SHAPE`], [`INFINI_STATUS_BAD_TENSOR_DTYPE`], [`INFINI_STATUS_BAD_TENSOR_STRIDES`], [`INFINI_STATUS_BAD_DEVICE`].
 
 ### 计算额外工作空间
 
 ```c
-infiniopStatus_t infiniopGetRMSNormWorkspaceSize(
+infiniStatus_t infiniopGetRMSNormWorkspaceSize(
     infiniopRMSNormDescriptor_t desc,
-    uint64_t *size
+    size_t *size
 );
 ```
 
@@ -109,12 +109,12 @@ infiniopStatus_t infiniopGetRMSNormWorkspaceSize(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
-- [`INFINIOP_STATUS_SUCCESS`], [`INFINIOP_STATUS_BAD_PARAM`], [`INFINIOP_STATUS_BAD_DEVICE`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_BAD_DEVICE`].
 
 ### 销毁算子描述符
 
 ```c
-infiniopStatus_t infiniopDestroyRMSNormDescriptor(
+infiniStatus_t infiniopDestroyRMSNormDescriptor(
     infiniopRMSNormDescriptor_t desc
 );
 ```
@@ -126,15 +126,15 @@ infiniopStatus_t infiniopDestroyRMSNormDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
 
-- [`INFINIOP_STATUS_SUCCESS`], [`INFINIOP_STATUS_BAD_DEVICE`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_DEVICE`].
 
 [`InfiniopHandle_t`]: /
 
-[`INFINIOP_STATUS_SUCCESS`]: /
-[`INFINIOP_STATUS_BAD_PARAM`]: /
-[`INFINIOP_STATUS_INSUFFICIENT_WORKSPACE`]: /
-[`INFINIOP_STATUS_BAD_DEVICE`]: /
-[`INFINIOP_STATUS_EXECUTION_FAILED`]: /
-[`INFINIOP_STATUS_BAD_TENSOR_SHAPE`]: /
-[`INFINIOP_STATUS_BAD_TENSOR_DTYPE`]: /
-[`INFINIOP_STATUS_BAD_TENSOR_STRIDES`]: /
+[`INFINI_STATUS_SUCCESS`]: /
+[`INFINI_STATUS_BAD_PARAM`]: /
+[`INFINI_STATUS_INSUFFICIENT_WORKSPACE`]: /
+[`INFINI_STATUS_BAD_DEVICE`]: /
+[`INFINI_STATUS_EXECUTION_FAILED`]: /
+[`INFINI_STATUS_BAD_TENSOR_SHAPE`]: /
+[`INFINI_STATUS_BAD_TENSOR_DTYPE`]: /
+[`INFINI_STATUS_BAD_TENSOR_STRIDES`]: /

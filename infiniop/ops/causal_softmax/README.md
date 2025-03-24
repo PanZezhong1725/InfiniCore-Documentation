@@ -27,7 +27,7 @@ $$ y_i = \frac{e^{x_i}}{\sum_{i=0}^{N - 1} e^{x_i}} $$
 ### 计算
 
 ```c
-infiniopStatus_t infiniopCausalSoftmax(
+infiniStatus_t infiniopCausalSoftmax(
     infiniopCausalSoftmaxDescriptor_t desc,
     void *workspace,
     size_t workspace_size,
@@ -54,14 +54,14 @@ infiniopStatus_t infiniopCausalSoftmax(
 
 <div style="background-color: lightblue; padding: 1px;">  返回值：</div>
 
- - [`INFINIOP_STATUS_SUCCESS`], [`INFINIOP_STATUS_BAD_PARAM`], [`INFINIOP_STATUS_BAD_DEVICE`], [`INFINIOP_STATUS_EXECUTION_FAILED`]
+ - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_BAD_DEVICE`], [`INFINI_STATUS_EXECUTION_FAILED`]
 
 ---
 
 ### 创建算子描述
 
 ```c
-infiniopStatus_t infiniopCreateCausalSoftmaxDescriptor(
+infiniStatus_t infiniopCreateCausalSoftmaxDescriptor(
     infiniopHandle_t handle,
     infiniopCausalSoftmaxDescriptor_t *desc_ptr,  
     infiniopTensorDescriptor_t t_desc
@@ -82,14 +82,14 @@ infiniopStatus_t infiniopCreateCausalSoftmaxDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
- - [`INFINIOP_STATUS_SUCCESS`], [`INFINIOP_STATUS_BAD_PARAM`],  [`INFINIOP_STATUS_BAD_TENSOR_SHAPE`], [`INFINIOP_STATUS_BAD_TENSOR_DTYPE`], [`INFINIOP_STATUS_BAD_TENSOR_STRIDES`], [`INFINIOP_STATUS_BAD_DEVICE`].
+ - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`],  [`INFINI_STATUS_BAD_TENSOR_SHAPE`], [`INFINI_STATUS_BAD_TENSOR_DTYPE`], [`INFINI_STATUS_BAD_TENSOR_STRIDES`], [`INFINI_STATUS_BAD_DEVICE`].
 
 ---
 
 ### 计算额外工作空间
 
 ```c
-infiniopStatus_t infiniopGetCausalSoftmaxWorkspaceSize(
+infiniStatus_t infiniopGetCausalSoftmaxWorkspaceSize(
     infiniopCausalSoftmaxDescriptor_t desc,
     size_t *size
 );
@@ -103,7 +103,7 @@ infiniopStatus_t infiniopGetCausalSoftmaxWorkspaceSize(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
- - [`INFINIOP_STATUS_SUCCESS`], [`INFINIOP_STATUS_BAD_PARAM`], [`INFINIOP_STATUS_BAD_DEVICE`].
+ - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_BAD_DEVICE`].
 
 ---
 
@@ -122,15 +122,15 @@ infiniopStatus_t infiniopDestroyCausalSoftmaxDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
 
- - [`INFINIOP_STATUS_SUCCESS`], [`INFINIOP_STATUS_BAD_DEVICE`].
+ - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_DEVICE`].
 
 [`InfiniopHandle_t`]: /
 
-[`INFINIOP_STATUS_SUCCESS`]: /
-[`INFINIOP_STATUS_BAD_PARAM`]: /
-[`INFINIOP_STATUS_INSUFFICIENT_WORKSPACE`]: /
-[`INFINIOP_STATUS_BAD_DEVICE`]: /
-[`INFINIOP_STATUS_EXECUTION_FAILED`]: /
-[`INFINIOP_STATUS_BAD_TENSOR_SHAPE`]: /
-[`INFINIOP_STATUS_BAD_TENSOR_DTYPE`]: /
-[`INFINIOP_STATUS_BAD_TENSOR_STRIDES`]: /
+[`INFINI_STATUS_SUCCESS`]: /
+[`INFINI_STATUS_BAD_PARAM`]: /
+[`INFINI_STATUS_INSUFFICIENT_WORKSPACE`]: /
+[`INFINI_STATUS_BAD_DEVICE`]: /
+[`INFINI_STATUS_EXECUTION_FAILED`]: /
+[`INFINI_STATUS_BAD_TENSOR_SHAPE`]: /
+[`INFINI_STATUS_BAD_TENSOR_DTYPE`]: /
+[`INFINI_STATUS_BAD_TENSOR_STRIDES`]: /
