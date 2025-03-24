@@ -69,7 +69,7 @@ $$
 ### 计算
 
 ```c
-infiniopStatus_t infiniopRearrange(
+infiniStatus_t infiniopRearrange(
     infiniopRearrangeDescriptor_t desc,
     void *dst,
     const void *src,
@@ -80,22 +80,22 @@ infiniopStatus_t infiniopRearrange(
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
 
 - `desc`:
-  输入。已使用 `infiniopCreateRearrangeDescriptor()` 初始化的算子描述符；
+  已使用 `infiniopCreateRearrangeDescriptor()` 初始化的算子描述符；
 - `dst`:
-  输出。Device 指针，计算输出结果；
+  计算输出结果；
 - `src`:
-  输入。Device 常量指针，输入张量；
+  输入张量；
 - `stream`:
-  输入。计算流/队列；
+  计算流/队列；
 
 <div style="background-color: lightblue; padding: 1px;">  返回值：</div>
 
-- [`INFINIOP_STATUS_SUCCESS`], [`INFINIOP_STATUS_BAD_PARAM`], [`INFINIOP_STATUS_BAD_DEVICE`], [`INFINIOP_STATUS_EXECUTION_FAILED`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_BAD_DEVICE`], [`INFINI_STATUS_EXECUTION_FAILED`].
 
 ### 创建算子描述
 
 ```c
-infiniopStatus_t infiniopCreateRearrangeDescriptor(
+infiniStatus_t infiniopCreateRearrangeDescriptor(
     infiniopHandle_t handle,
     infiniopRearrangeDescriptor_t *desc_ptr,
     infiniopTensorDescriptor_t dst_desc,
@@ -106,13 +106,13 @@ infiniopStatus_t infiniopCreateRearrangeDescriptor(
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
 - `handle`:
-  输入。`infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]
+  `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]
 - `desc_ptr`:
-  输出。Host `infiniopCreateRearrangeDescriptor` 指针，指向将被初始化的算子描述符地址；
+  `infiniopCreateRearrangeDescriptor` 指针，指向将被初始化的算子描述符地址；
 - `dst_desc` - $\{ dT | shape | strides_{dst} \}$:
-  输出。算子输出 `dst` 的张量描述；
+  算子输出 `dst` 的张量描述；
 - `src_desc` - $\{ dT | shape | strides_{src} \}$:
-  输入。算子计算参数 `src` 的张量描述；
+  算子计算参数 `src` 的张量描述；
 
 <div style="background-color: lightblue; padding: 1px;"> 参数限制：</div>
 
@@ -120,17 +120,17 @@ infiniopStatus_t infiniopCreateRearrangeDescriptor(
 
 - $dT$: 任意类型；
 - $shape$: 任意形状；
-- $strides_{dst}$: 任意布局，但不能含有 0 步长（广播）；
+- $strides_{dst}$: 任意布局，但长度不为 1 的维度不能含有 0 步长（广播）；
 - $strides_{src}$: 任意布局；
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
-- [`INFINIOP_STATUS_SUCCESS`], [`INFINIOP_STATUS_BAD_PARAM`], [`INFINIOP_STATUS_BAD_TENSOR_SHAPE`], [`INFINIOP_STATUS_BAD_TENSOR_DTYPE`], [`INFINIOP_STATUS_BAD_TENSOR_STRIDES`], [`INFINIOP_STATUS_BAD_DEVICE`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_BAD_TENSOR_SHAPE`], [`INFINI_STATUS_BAD_TENSOR_DTYPE`], [`INFINI_STATUS_BAD_TENSOR_STRIDES`], [`INFINI_STATUS_BAD_DEVICE`].
 
 ### 销毁算子描述符
 
 ```c
-infiniopStatus_t infiniopDestroyRearrangeDescriptor(
+infiniStatus_t infiniopDestroyRearrangeDescriptor(
     infiniopRearrangeDescriptor_t desc
 );
 ```
@@ -142,7 +142,7 @@ infiniopStatus_t infiniopDestroyRearrangeDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
 
-- [`INFINIOP_STATUS_SUCCESS`], [`INFINIOP_STATUS_BAD_DEVICE`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_DEVICE`].
 
 ## 已知问题
 
@@ -152,10 +152,10 @@ infiniopStatus_t infiniopDestroyRearrangeDescriptor(
 
 [`InfiniopHandle_t`]:/
 
-[`INFINIOP_STATUS_SUCCESS`]:/
-[`INFINIOP_STATUS_BAD_PARAM`]:/
-[`INFINIOP_STATUS_BAD_DEVICE`]:/
-[`INFINIOP_STATUS_EXECUTION_FAILED`]:/
-[`INFINIOP_STATUS_BAD_TENSOR_SHAPE`]:/
-[`INFINIOP_STATUS_BAD_TENSOR_DTYPE`]:/
-[`INFINIOP_STATUS_BAD_TENSOR_STRIDES`]:/
+[`INFINI_STATUS_SUCCESS`]:/
+[`INFINI_STATUS_BAD_PARAM`]:/
+[`INFINI_STATUS_BAD_DEVICE`]:/
+[`INFINI_STATUS_EXECUTION_FAILED`]:/
+[`INFINI_STATUS_BAD_TENSOR_SHAPE`]:/
+[`INFINI_STATUS_BAD_TENSOR_DTYPE`]:/
+[`INFINI_STATUS_BAD_TENSOR_STRIDES`]:/
