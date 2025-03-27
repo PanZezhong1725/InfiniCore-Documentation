@@ -58,8 +58,8 @@ infiniStatus_t infiniopRoPE(
     size_t workspace_size,
     void *t,
     const void *pos_ids,
-    const void *sin_table,
-    const void *cos_table,
+    const float *sin_table,
+    const float *cos_table,
     void *stream
 );
 ```
@@ -114,15 +114,15 @@ infiniStatus_t infiniopCreateRoPEDescriptor(
   张量必须为三维：`(seq_len, num_head, head_dim)`。最后一维数据必须连续，即步长为1，且长度`(head_dim)` 为2的倍数；
 - `pos_ids` - { dI | `(seq_len)` | (~) }:
   位置信息张量描述。张量必须为一维连续张量，长度为 `seq_len` 。用户需自行保证位置数据中所有数值小于 `max_seq_len`；
-- `sin_table` - { dT | `(max_seq_len, head_dim/2)` | (~) }:
+- `sin_table` - { float | `(max_seq_len, head_dim/2)` | (~) }:
   sin 值表的张量描述，二维连续张量，形状为 `(max_seq_len, head_dim/2)`；
-- `cos_table` - { dT | `(max_seq_len, head_dim/2)` | (~) }:
+- `cos_table` - { float | `(max_seq_len, head_dim/2)` | (~) }:
   cos 值表的张量描述，要求与 sin 表相同；
 
 参数限制：
 
-- `dT`:  (`Float16`, `Float32`) 之一；
-- `dI`: (`Int16`, `Int32`, `Uint16`, `Uint32`) 之一；
+- `dT`:  (`Float16`, `Float32`, `Float64`) 之一；
+- `dI`: (`Uint8`, `Uint16`, `Uint32`, `Uint64`) 之一；
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
