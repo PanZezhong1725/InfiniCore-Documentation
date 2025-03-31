@@ -55,7 +55,7 @@ infiniStatus_t infiniopCreateSoftmaxDescriptor(
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
 - `handle`
-     : `infiniopHandle_t` 类型的硬件控柄。详情请看：[InfiniopHandle_t]()
+     : `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]
 - `desc_ptr`
      : `infiniopSoftmaxDescriptor_t` 指针，指向将被初始化的算子描述符地址。
 - `input_desc` - { dT | ($\ldots$) | ($\ldots$) }
@@ -93,17 +93,18 @@ infiniStatus_t infiniopDestroySoftmaxDescriptor(
 
 - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_DEVICE`].
 
-[`INFINI_STATUS_SUCCESS`]: /
-[`INFINI_STATUS_BAD_PARAM`]: /
-[`INFINI_STATUS_BAD_DEVICE`]: /
-[`INFINI_STATUS_BAD_TENSOR_SHAPE`]: /
-[`INFINI_STATUS_BAD_TENSOR_DTYPE`]: /
-[`INFINI_STATUS_BAD_TENSOR_STRIDES`]: /
-
 ## 已知问题
 
 ### 平台限制
 
 - 寒武纪中 tensor.to(device) 的 tensor 不支持 uint64 或者是 int64 数据类型。
 
-###
+<!-- 链接 -->
+[`InfiniopHandle_t`]: /infiniop/handle/README.md
+
+[`INFINI_STATUS_SUCCESS`]: /common/status/README.md#INFINI_STATUS_SUCCESS
+[`INFINI_STATUS_BAD_PARAM`]: /common/status/README.md#INFINI_STATUS_BAD_PARAM
+[`INFINI_STATUS_BAD_DEVICE`]: /common/status/README.md#INFINI_STATUS_BAD_DEVICE
+[`INFINI_STATUS_BAD_TENSOR_SHAPE`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_SHAPE
+[`INFINI_STATUS_BAD_TENSOR_DTYPE`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_DTYPE
+[`INFINI_STATUS_BAD_TENSOR_STRIDES`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_STRIDES
