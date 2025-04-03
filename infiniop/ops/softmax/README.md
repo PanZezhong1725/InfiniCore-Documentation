@@ -54,16 +54,11 @@ infiniStatus_t infiniopCreateSoftmaxDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
-- `handle`
-     : `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]
-- `desc_ptr`
-     : `infiniopSoftmaxDescriptor_t` 指针，指向将被初始化的算子描述符地址。
-- `input_desc` - { dT | ($\ldots$) | ($\ldots$) }
-     : 算子计算参数 `input_desc` 的张量描述，数据为 $r$  维张量，其中 $r$ 是任意正整数。
-- `axis` ：int
-     : 默认值是 -1 ，表示操作维度是最后一维，可选择范围是 $[-r, r - 1]$ 。
-- `output_desc` - { dT | ($\ldots$) | ($\ldots$) }
-     : 算子计算参数 `output_desc` 的张量描述，张量形状和 `input_desc` 保持一致。
+- `handle`: `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]
+- `desc_ptr`: `infiniopSoftmaxDescriptor_t` 指针，指向将被初始化的算子描述符地址。
+- `input_desc` - { dT | ($\ldots$) | ($\ldots$) }: 算子计算参数 `input_desc` 的张量描述，数据为 $r$  维张量，其中 $r$ 是任意正整数。
+- `axis`: 默认值是 -1 ，表示操作维度是最后一维，可选择范围是 $[-r, r - 1]$ 。
+- `output_desc` - { dT | ($\ldots$) | ($\ldots$) } : 算子计算参数 `output_desc` 的张量描述，张量形状和 `input_desc` 保持一致。
 
 参数限制：
 

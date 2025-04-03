@@ -1,7 +1,7 @@
-# `数据类型（infiniDtype_t）`
+# 数据类型（`infiniDtype_t`）
 
 | 常量名称               | 数值   | 数据类型      |
-|-----------------------|-------|------------------|
+|-----------------------|:------:|------------------|
 | INFINI_DTYPE_INVALID  | 0     | 非法类型    |
 | INFINI_DTYPE_BYTE     | 1     | Byte: 字节            |
 | INFINI_DTYPE_BOOL     | 2     | Boolean: 布尔         |

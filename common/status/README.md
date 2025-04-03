@@ -1,6 +1,6 @@
-# `接口调用结果代码（infiniStatus_t）`
+# 接口调用结果代码（`infiniStatus_t`）
 
-`InfiniCore` 库中所有的API均会返回接口调用结果，用来表示调用是否成果以及错误类型。各类返回值以及含义如下：
+*InfiniCore* 库中所有的API均会返回接口调用结果，用来表示调用是否成果以及错误类型。各类返回值以及含义如下：
 
 <a id="INFINI_STATUS_SUCCESS"></a>
 
