@@ -116,8 +116,6 @@ infiniStatus_t infiniopCreateRearrangeDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 参数限制：</div>
 
-参数限制：
-
 - $dT$: 任意类型；
 - $shape$: 任意形状；
 - $strides_{dst}$: 任意布局，但长度不为 1 的维度不能含有 0 步长（广播）；
