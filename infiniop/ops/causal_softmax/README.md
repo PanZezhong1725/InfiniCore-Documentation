@@ -37,16 +37,11 @@ infiniStatus_t infiniopCausalSoftmax(
 ```
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
 
- - `desc`:
-     使用 `infiniopCreateCausalSoftmaxDescriptor()` 初始化的算子描述符。
- - `workspace`:
-     算子计算所需的额外工作空间。
- - `workspace_size`:
-     `workspace` 的大小，单位：字节（byte）。
- - `data`:
-     输入以及计算结果的数据地址。张量限制见[创建算子描述](#创建算子描述)部分。
- - `stream`:
-     计算流/队列。
+ - `desc`: 使用 `infiniopCreateCausalSoftmaxDescriptor()` 初始化的算子描述符。
+ - `workspace`: 算子计算所需的额外工作空间。
+ - `workspace_size`: `workspace` 的大小，单位：字节（byte）。
+ - `data`: 输入以及计算结果的数据地址。张量限制见[创建算子描述](#创建算子描述)部分。
+ - `stream`: 计算流/队列。
 
 参数限制：
 
@@ -69,10 +64,8 @@ infiniStatus_t infiniopCreateCausalSoftmaxDescriptor(
 ```
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
- - `handle`:
-     `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]
- - `desc_ptr`:
-     存放将被初始化的算子描述符的地址。
+ - `handle`: `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]
+ - `desc_ptr`: 存放将被初始化的算子描述符的地址。
  - `t_desc` - { dT | ((batch,) total, seqlen) | ($\ldots,1$) }:
      算子计算参数 `t_desc` 的张量描述，三维或者两维，最后一维连续。
 
@@ -96,10 +89,8 @@ infiniStatus_t infiniopGetCausalSoftmaxWorkspaceSize(
 ```
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
- - `desc`:
-     使用 `infiniopCreateCausalSoftmaxDescriptor()` 初始化的算子描述符。
- - `size`:
-     存放额外空间大小的计算结果的地址。
+ - `desc`: 使用 `infiniopCreateCausalSoftmaxDescriptor()` 初始化的算子描述符。
+ - `size`: 存放额外空间大小的计算结果的地址。
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
@@ -117,20 +108,20 @@ infiniopStatus_t infiniopDestroyCausalSoftmaxDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
 
- - `desc`:
-     待销毁的算子描述符。
+ - `desc`: 待销毁的算子描述符。
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
 
  - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_DEVICE`].
 
-[`InfiniopHandle_t`]: /
+<!-- 链接 -->
+[`InfiniopHandle_t`]: /infiniop/handle/README.md
 
-[`INFINI_STATUS_SUCCESS`]: /
-[`INFINI_STATUS_BAD_PARAM`]: /
-[`INFINI_STATUS_INSUFFICIENT_WORKSPACE`]: /
-[`INFINI_STATUS_BAD_DEVICE`]: /
-[`INFINI_STATUS_EXECUTION_FAILED`]: /
-[`INFINI_STATUS_BAD_TENSOR_SHAPE`]: /
-[`INFINI_STATUS_BAD_TENSOR_DTYPE`]: /
-[`INFINI_STATUS_BAD_TENSOR_STRIDES`]: /
+[`INFINI_STATUS_SUCCESS`]: /common/status/README.md#INFINI_STATUS_SUCCESS
+[`INFINI_STATUS_BAD_PARAM`]: /common/status/README.md#INFINI_STATUS_BAD_PARAM
+[`INFINI_STATUS_INSUFFICIENT_WORKSPACE`]: /common/status/README.md#INFINI_STATUS_INSUFFICIENT_WORKSPACE
+[`INFINI_STATUS_BAD_DEVICE`]: /common/status/README.md#INFINI_STATUS_BAD_DEVICE
+[`INFINI_STATUS_EXECUTION_FAILED`]: /common/status/README.md#INFINI_STATUS_EXECUTION_FAILED
+[`INFINI_STATUS_BAD_TENSOR_SHAPE`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_SHAPE
+[`INFINI_STATUS_BAD_TENSOR_DTYPE`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_DTYPE
+[`INFINI_STATUS_BAD_TENSOR_STRIDES`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_STRIDES
