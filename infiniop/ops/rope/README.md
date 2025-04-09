@@ -1,51 +1,29 @@
 ﻿
 # `Rotary Position Embedding`
 
-`Rotary Position Embedding`, 即**旋转位置编码**算子：
+`Rotary Position Embedding`, 即**旋转位置编码**算子。
 
-旋转频率 ( $\theta$ )
+对于一个位置为 $m$ 的 token 的嵌入向量 $x$ 中的每两个相邻元素，即第 $2i$ 和 $2i+1$ 个元素，其旋转后的嵌入向量 $y$ 可以表示为：
 
-计算公式为：
+  $$
+  y[2i] = x[2i] \cdot \cos(m\cdot \theta_i) - x[2i+1] \cdot \sin(m\cdot \theta_i)
+  $$
+  $$
+  y[2i+1] = x[2i] \cdot \sin(m\cdot \theta_i) + x[2i+1] \cdot \cos(m\cdot \theta_i)
+  $$
+
+其中：
 
 $$
 \theta_{i} = \text{base}^{\frac{-2i}{d}}
 $$
 
-其中：
+- `base`：控制旋转速率的超参数，常用 `base` = 10000；
+- `d` ：嵌入向量长度，须为2的倍数；
+- `i`：嵌入维度的双步长索引，满足 $i \in [0, ..., d/2 - 1]$；
+- `m`：位置
 
-- `base`：控制旋转速率的超参数，通常为 `base` = 10000；
-- `i`：当前嵌入维度的索引；
-- `d` ：嵌入的总维度；
-
-每个 token 的嵌入向量的旋转变换，对于第 `k` 个维度（每个 token 的两个部分）：
-
-**获取原始嵌入**：
-
-  $$
-  a = \text{t[2k]}
-  $$
-
-  $$
-  b = \text{t[2k+1]}
-  $$
-
-**获取对应位置的正弦和余弦值**：
-
-  $$
-  \sin_0 = \sin[2k], \quad \cos_0 = \cos[2k]
-  $$
-  $$
-  \sin_1 = \sin[2k + 1], \quad \cos_1 = \cos[2k + 1]
-  $$
-
-**旋转嵌入向量**：
-
-  $$
-  t[2k] = a \cdot \cos_0 - b \cdot \sin_0
-  $$
-  $$
-  t[2k+1] = a \cdot \sin_1 + b \cdot \cos_1
-  $$
+公式中的正弦和余弦值 ( $\sin(m\cdot \theta_i)$ 和 $\cos(m\cdot \theta_i)$ ) 只与位置 `m` 和向量长度 `d` 有关，而与嵌入向量的数值无关。本接口支持用户以数表的形式传入正弦和余弦值，避免冗余计算。
 
 ## 接口
 
@@ -56,7 +34,8 @@ infiniStatus_t infiniopRoPE(
     infiniopRoPEDescriptor_t desc,
     void *workspace,
     size_t workspace_size,
-    void *t,
+    void *y,
+    const void *x,
     const void *pos_ids,
     const float *sin_table,
     const float *cos_table,
@@ -69,13 +48,15 @@ infiniStatus_t infiniopRoPE(
 - `desc`:
   已使用 `infiniopCreateRoPEDescriptor()` 初始化的算子描述符；
 - `workspace`:
-  指向算子计算所需的额外工作空间；
+  额外工作空间；
 - `workspace_size`:
   `workspace` 的大小，单位：字节；
-- `t`:
-  （比如 attention 层中的 query 或 key）张量数据指针。张量限制见[创建算子描述](#创建算子描述)部分；
+- `y`:
+  计算结果地址，当与 `x` 相同时为原地操作；
+- `x`:
+  嵌入向量矩阵（比如自注意力层中的 query 或 key）的数据指针，可与 `y` 相同。张量限制见[创建算子描述](#创建算子描述)部分；
 - `pos_ids`:
-  位置数值张量指针，代表 data 中每个向量对应的 cos、sin 表中的序号。计算时，会根据序号选择表中的数值进行位置编码。用户应自行保证序号不会超过 cos、sin 表的长度。张量限制见[创建算子描述](#创建算子描述)部分；
+  位置数值的地址，代表 `x` 中每个向量对应的 cos、sin 表中的序号。计算时，会根据序号选择表中的数值进行位置编码。用户应自行保证序号不会超过 cos、sin 表的长度。张量限制见[创建算子描述](#创建算子描述)部分；
 - `sin_table`:
   sin 表指针。张量限制见[创建算子描述](#创建算子描述)部分；
 - `cos_table`:
@@ -85,11 +66,7 @@ infiniStatus_t infiniopRoPE(
 
 <div style="background-color: lightblue; padding: 1px;">  返回值：</div>
 
-- [`INFINI_STATUS_SUCCESS`], [`STATUS_MEMORY_NOT_ALLOCATED`], [`STATUS_BAD_TENSOR_SHAPE`], [`STATUS_BAD_TENSOR_STRIDES`], [`STATUS_BAD_TENSOR_DTYPE`].
-
-- 当 `t`、`pos_ids`、`sin_table`、或 `cos_table` 参数张量不统一返回 `INFINI_STATUS_BAD_PARAM`；
-- 当 `t`、`pos_ids`、`sin_table`、或 `cos_table` 张量形状不符合要求返回 `INFINI_STATUS_BAD_TENSOR_SHAPE`；
-- 当 `t`、`pos_ids`、`sin_table`、或 `cos_table` 输入输出张量类型不被支持返回 `INFINI_STATUS_BAD_TENSOR_DTYPE`；
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_NULL_POINTER`], [`INFINI_STATUS_INSUFFICIENT_WORKSPACE`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`], [`INFINI_STATUS_INTERNAL_ERROR`].
 
 ### 创建算子描述
 
@@ -97,7 +74,8 @@ infiniStatus_t infiniopRoPE(
 infiniStatus_t infiniopCreateRoPEDescriptor(
     infiniopHandle_t handle,
     infiniopRoPEDescriptor_t *desc_ptr,
-    infiniopTensorDescriptor_t t,
+    infiniopTensorDescriptor_t y,
+    infiniopTensorDescriptor_t x,
     infiniopTensorDescriptor_t pos_ids,
     infiniopTensorDescriptor_t sin_table,
     infiniopTensorDescriptor_t cos_table
@@ -110,13 +88,15 @@ infiniStatus_t infiniopCreateRoPEDescriptor(
  : `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]；
 - `desc_ptr`:
   `infiniopRoPEDescriptor_t` 指针，指向将被初始化的算子描述符地址；
-- `t` - { dT | `(seq_len, num_head, head_dim)` | (..., 1) }:
-  张量必须为三维：`(seq_len, num_head, head_dim)`。最后一维数据必须连续，即步长为1，且长度`(head_dim)` 为2的倍数；
-- `pos_ids` - { dI | `(seq_len)` | (~) }:
+- `y` - { dT | (seq_len, num_head, head_dim) | (..., 1) }:
+  三维张量。最后一维必须连续，且长度 `head_dim` 为2的倍数；
+- `x` - { dT | (seq_len, num_head, head_dim) | (..., 1) }:
+  限制与 `y` 相同；
+- `pos_ids` - { dI | (seq_len) | (~) }:
   位置信息张量描述。张量必须为一维连续张量，长度为 `seq_len` 。用户需自行保证位置数据中所有数值小于 `max_seq_len`；
-- `sin_table` - { float | `(max_seq_len, head_dim/2)` | (~) }:
-  sin 值表的张量描述，二维连续张量，形状为 `(max_seq_len, head_dim/2)`；
-- `cos_table` - { float | `(max_seq_len, head_dim/2)` | (~) }:
+- `sin_table` - { dT | (max_seq_len, head_dim/2) | (~) }:
+  sin 值表的张量描述，二维连续张量；
+- `cos_table` - { dT | (max_seq_len, head_dim/2) | (~) }:
   cos 值表的张量描述，要求与 sin 表相同；
 
 参数限制：
@@ -178,7 +158,7 @@ infiniStatus_t infiniopDestroyRoPEDescriptor(
 [`INFINI_STATUS_BAD_TENSOR_SHAPE`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_SHAPE
 [`INFINI_STATUS_BAD_TENSOR_DTYPE`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_DTYPE
 [`INFINI_STATUS_BAD_TENSOR_STRIDES`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_STRIDES
-[`STATUS_MEMORY_NOT_ALLOCATED`]:/common/status/README.md#STATUS_MEMORY_NOT_ALLOCATED
-[`STATUS_BAD_TENSOR_SHAPE`]:/common/status/README.md#STATUS_BAD_TENSOR_SHAPE
-[`STATUS_BAD_TENSOR_STRIDES`]:/common/status/README.md#STATUS_BAD_TENSOR_STRIDES
-[`STATUS_BAD_TENSOR_DTYPE`]:/common/status/README.md#STATUS_BAD_TENSOR_DTYP
+[`INFINI_STATUS_NULL_POINTER`]:/common/status/README.md#INFINI_STATUS_NULL_POINTER
+[`INFINI_STATUS_INSUFFICIENT_WORKSPACE`]:/common/status/README.md#INFINI_STATUS_INSUFFICIENT_WORKSPACE
+[`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]:/common/status/README.md#INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED
+[`INFINI_STATUS_INTERNAL_ERROR`]:/common/status/README.md#INFINI_STATUS_INTERNAL_ERROR

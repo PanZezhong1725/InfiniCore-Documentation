@@ -1,28 +1,32 @@
 
 # `Causal Softmax`
 
-`Causal Softmax` 是使用 causal mask 的 softmax 函数，其中指数变换的操作维度限定在最后一维，适用于各类因果类模型。
-在 `Softmax` 的基础上引入 mask ，对于形状为 $[s_0,\ldots, s_{r-1}]$ 的输入张量 $x$ 来说，mask = $s_{r - 1} - s_{r - 2} \geq 0$ 。
-以形状为 $[4, 7]$ 的张量 $x$ 举例，mask 变换如下所示：
+`Causal Softmax` 是使用二维因果掩码的 softmax 函数，常用于各类因果类模型。其公式如下：
+
+$$ y = softmax(x + mask) $$
+
+其中
+
+$$ softmax(v_i) = \frac{e^{v_i}}{\sum_{k=0}^{N - 1} e^{v_k}} $$
+
+对于一个形状为 $(M,N)$ 的二维输入（一般 $M\leq N$），因果掩码定义如下：
+
+$$
+mask_{i,j} =
+\begin{cases}
+0 & \text{if } i \leq N - M + j \\
+-\infty & \text{otherwise}
+\end{cases}
+$$
+
+以形状为 $[4, 7]$ 的输入为例，最终计算结果会有如下形式：
 
 $$ \left[\begin{gathered}
-     x_{0,0} & x_{0,1} & x_{0, 2} & x_{0, 3} & x_{0, 4} & x_{0,5} & x_{0, 6}\\
-     x_{1,0} & x_{1,1} & x_{1, 2} & x_{1, 3} & x_{1, 4} & x_{1,5} & x_{1, 6}\\
-     x_{2,0} & x_{2,1} & x_{2, 2} & x_{2, 3} & x_{2, 4} & x_{2,5} & x_{2, 6}\\
-     x_{3,0} & x_{3,1} & x_{3, 2} & x_{3, 3} & x_{3, 4} & x_{3,5} & x_{3, 6}
-    \end{gathered}\right]  \Rightarrow $$
-$$ \left[\begin{gathered}
-     x_{0,0} & x_{0,1} & x_{0, 2} & x_{0, 3} & 0 & 0 & 0\\
-     x_{1,0} & x_{1,1} & x_{1, 2} & x_{1, 3} & x_{1, 4} & 0 & 0\\
-     x_{2,0} & x_{2,1} & x_{2, 2} & x_{2, 3} & x_{2, 4} & x_{2,5} & 0\\
-     x_{3,0} & x_{3,1} & x_{3, 2} & x_{3, 3} & x_{3, 4} & x_{3,5} & x_{3, 6}
+     y_{0,0} & y_{0,1} & y_{0, 2} & y_{0, 3} & 0 & 0 & 0\\
+     y_{1,0} & y_{1,1} & y_{1, 2} & y_{1, 3} & y_{1, 4} & 0 & 0\\
+     y_{2,0} & y_{2,1} & y_{2, 2} & y_{2, 3} & y_{2, 4} & y_{2,5} & 0\\
+     y_{3,0} & y_{3,1} & y_{3, 2} & y_{3, 3} & y_{3, 4} & y_{3,5} & y_{3, 6}
     \end{gathered}\right] $$
-
-经过 mask 变换以后针对最后一维做 softmax 变换即可，一维向量的 softmax 变换参考：
-
-$$ y_i = \frac{e^{x_i}}{\sum_{i=0}^{N - 1} e^{x_i}} $$  
-
-高维向量的 `Causal Softmax` 只需要考虑最后两维即可。
 
 ### 计算
 
@@ -31,7 +35,8 @@ infiniStatus_t infiniopCausalSoftmax(
     infiniopCausalSoftmaxDescriptor_t desc,
     void *workspace,
     size_t workspace_size,
-    void *data,
+    void *y,
+    const void *x,
     void *stream
 );
 ```
@@ -40,16 +45,13 @@ infiniStatus_t infiniopCausalSoftmax(
  - `desc`: 使用 `infiniopCreateCausalSoftmaxDescriptor()` 初始化的算子描述符。
  - `workspace`: 算子计算所需的额外工作空间。
  - `workspace_size`: `workspace` 的大小，单位：字节（byte）。
- - `data`: 输入以及计算结果的数据地址。张量限制见[创建算子描述](#创建算子描述)部分。
+ - `y`: 计算结果的数据地址。张量限制见[创建算子描述](#创建算子描述)部分。
+ - `x`: 输入数据地址，可以与 `y` 相同。张量限制见[创建算子描述](#创建算子描述)部分。
  - `stream`: 计算流/队列。
-
-参数限制：
-
- - `data` 仅支持原地计算。
 
 <div style="background-color: lightblue; padding: 1px;">  返回值：</div>
 
- - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_BAD_DEVICE`], [`INFINI_STATUS_EXECUTION_FAILED`]
+ - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`], [`INFINI_STATUS_INTERNAL_ERROR`]
 
 ---
 
@@ -59,15 +61,18 @@ infiniStatus_t infiniopCausalSoftmax(
 infiniStatus_t infiniopCreateCausalSoftmaxDescriptor(
     infiniopHandle_t handle,
     infiniopCausalSoftmaxDescriptor_t *desc_ptr,  
-    infiniopTensorDescriptor_t t_desc
+    infiniopTensorDescriptor_t y_desc,
+    infiniopTensorDescriptor_t x_desc
 );
 ```
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
  - `handle`: `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]
  - `desc_ptr`: 存放将被初始化的算子描述符的地址。
- - `t_desc` - { dT | ((batch,) total, seqlen) | ($\ldots,1$) }:
-     算子计算参数 `t_desc` 的张量描述，三维或者两维，最后一维连续。
+ - `y_desc` - { dT | ((batch,) total, seqlen) | ($\ldots,1$) }:
+     算子计算参数 `y` 的张量描述，三维或者两维，最后一维连续。
+ - `x_desc` - { dT | ((batch,) total, seqlen) | ($\ldots,1$) }:
+     算子计算参数 `x` 的张量描述，形状与 `y_desc` 一致，最后一维连续。
 
 参数限制：
 
@@ -75,7 +80,7 @@ infiniStatus_t infiniopCreateCausalSoftmaxDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
- - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`],  [`INFINI_STATUS_BAD_TENSOR_SHAPE`], [`INFINI_STATUS_BAD_TENSOR_DTYPE`], [`INFINI_STATUS_BAD_TENSOR_STRIDES`], [`INFINI_STATUS_BAD_DEVICE`].
+ - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`],  [`INFINI_STATUS_BAD_TENSOR_SHAPE`], [`INFINI_STATUS_BAD_TENSOR_DTYPE`], [`INFINI_STATUS_BAD_TENSOR_STRIDES`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`].
 
 ---
 
@@ -94,7 +99,7 @@ infiniStatus_t infiniopGetCausalSoftmaxWorkspaceSize(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
- - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_BAD_DEVICE`].
+ - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`].
 
 ---
 
@@ -112,7 +117,7 @@ infiniopStatus_t infiniopDestroyCausalSoftmaxDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
 
- - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_DEVICE`].
+ - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`].
 
 <!-- 链接 -->
 [`InfiniopHandle_t`]: /infiniop/handle/README.md
@@ -120,8 +125,8 @@ infiniopStatus_t infiniopDestroyCausalSoftmaxDescriptor(
 [`INFINI_STATUS_SUCCESS`]: /common/status/README.md#INFINI_STATUS_SUCCESS
 [`INFINI_STATUS_BAD_PARAM`]: /common/status/README.md#INFINI_STATUS_BAD_PARAM
 [`INFINI_STATUS_INSUFFICIENT_WORKSPACE`]: /common/status/README.md#INFINI_STATUS_INSUFFICIENT_WORKSPACE
-[`INFINI_STATUS_BAD_DEVICE`]: /common/status/README.md#INFINI_STATUS_BAD_DEVICE
-[`INFINI_STATUS_EXECUTION_FAILED`]: /common/status/README.md#INFINI_STATUS_EXECUTION_FAILED
+[`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]: /common/status/README.md#INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED
+[`INFINI_STATUS_INTERNAL_ERROR`]: /common/status/README.md#INFINI_STATUS_INTERNAL_ERROR
 [`INFINI_STATUS_BAD_TENSOR_SHAPE`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_SHAPE
 [`INFINI_STATUS_BAD_TENSOR_DTYPE`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_DTYPE
 [`INFINI_STATUS_BAD_TENSOR_STRIDES`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_STRIDES
