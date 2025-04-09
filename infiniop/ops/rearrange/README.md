@@ -7,8 +7,8 @@
 
 例如，要转置 $2 \times 3$ 矩阵：
 
-> - 符号表示数据元素；
-> - 下标表示数据在存储空间中的位置；
+> - 符号表示数据元素。
+> - 下标表示数据在存储空间中的位置。
 
 $$
 src:
@@ -80,17 +80,17 @@ infiniStatus_t infiniopRearrange(
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
 
 - `desc`:
-  已使用 `infiniopCreateRearrangeDescriptor()` 初始化的算子描述符；
+  已使用 `infiniopCreateRearrangeDescriptor()` 初始化的算子描述符。
 - `dst`:
-  计算输出结果；
+  计算输出结果。
 - `src`:
-  输入张量；
+  输入张量。
 - `stream`:
-  计算流/队列；
+  计算流/队列。
 
 <div style="background-color: lightblue; padding: 1px;">  返回值：</div>
 
-- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_BAD_DEVICE`], [`INFINI_STATUS_EXECUTION_FAILED`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`], [`INFINI_STATUS_INTERNAL_ERROR`].
 
 ### 创建算子描述
 
@@ -108,24 +108,24 @@ infiniStatus_t infiniopCreateRearrangeDescriptor(
 - `handle`:
   `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]
 - `desc_ptr`:
-  `infiniopCreateRearrangeDescriptor` 指针，指向将被初始化的算子描述符地址；
+  `infiniopCreateRearrangeDescriptor` 指针，指向将被初始化的算子描述符地址。
 - `dst_desc` - $\{ dT | shape | strides_{dst} \}$:
-  算子输出 `dst` 的张量描述；
+  算子输出 `dst` 的张量描述。
 - `src_desc` - $\{ dT | shape | strides_{src} \}$:
-  算子计算参数 `src` 的张量描述；
+  算子计算参数 `src` 的张量描述。
 
 <div style="background-color: lightblue; padding: 1px;"> 参数限制：</div>
 
 参数限制：
 
-- $dT$: 任意类型；
-- $shape$: 任意形状；
-- $strides_{dst}$: 任意布局，但长度不为 1 的维度不能含有 0 步长（广播）；
-- $strides_{src}$: 任意布局；
+- $dT$: 任意类型。
+- $shape$: 任意形状。
+- $strides_{dst}$: 任意布局，但长度不为 1 的维度不能含有 0 步长（广播）。
+- $strides_{src}$: 任意布局。
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
-- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_BAD_TENSOR_SHAPE`], [`INFINI_STATUS_BAD_TENSOR_DTYPE`], [`INFINI_STATUS_BAD_TENSOR_STRIDES`], [`INFINI_STATUS_BAD_DEVICE`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_BAD_TENSOR_SHAPE`], [`INFINI_STATUS_BAD_TENSOR_DTYPE`], [`INFINI_STATUS_BAD_TENSOR_STRIDES`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`].
 
 ### 销毁算子描述符
 
@@ -138,25 +138,25 @@ infiniStatus_t infiniopDestroyRearrangeDescriptor(
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
 
 - `desc`:
-  输入。待销毁的算子描述符；
+  输入。待销毁的算子描述符。
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
 
-- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_DEVICE`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`].
 
 ## 已知问题
 
 ### 平台限制
 
-- 除 CPU 外，其他平台不支持 3 阶以上的张量；
+- 除 CPU 外，其他平台不支持 3 阶以上的张量。
 
 <!-- 链接 -->
 [`InfiniopHandle_t`]: /infiniop/handle/README.md
 
 [`INFINI_STATUS_SUCCESS`]:/common/status/README.md#INFINI_STATUS_SUCCESS
 [`INFINI_STATUS_BAD_PARAM`]:/common/status/README.md#INFINI_STATUS_BAD_PARAM
-[`INFINI_STATUS_BAD_DEVICE`]:/common/status/README.md#INFINI_STATUS_BAD_DEVICE
-[`INFINI_STATUS_EXECUTION_FAILED`]:/common/status/README.md#INFINI_STATUS_EXECUTION_FAILED
+[`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]:/common/status/README.md#INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED
+[`INFINI_STATUS_INTERNAL_ERROR`]:/common/status/README.md#INFINI_STATUS_INTERNAL_ERROR
 [`INFINI_STATUS_BAD_TENSOR_SHAPE`]:/common/status/README.md#INFINI_STATUS_BAD_TENSOR_SHAPE
 [`INFINI_STATUS_BAD_TENSOR_DTYPE`]:/common/status/README.md#INFINI_STATUS_BAD_TENSOR_DTYPE
 [`INFINI_STATUS_BAD_TENSOR_STRIDES`]:/common/status/README.md#INFINI_STATUS_BAD_TENSOR_STRIDES
