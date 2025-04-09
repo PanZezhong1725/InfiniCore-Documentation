@@ -13,9 +13,9 @@ $$
 
 其中：
 
-- $c_{i}$: 输出张量第 `i` 个元素；
-- $a_{i}$: 输入张量第 `i` 个元素；
-- $b_{i}$: 门控输入张量第 `i` 个元素；
+- $c_{i}$: 输出张量第 `i` 个元素。
+- $a_{i}$: 输入张量第 `i` 个元素。
+- $b_{i}$: 门控输入张量第 `i` 个元素。
 
 ## 接口
 
@@ -34,15 +34,15 @@ infiniStatus_t infiniopSwiGLU(
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
 
 - `desc`:
-  已使用 `infiniopCreateSwiGLUDescriptor()` 初始化的算子描述符；
+  已使用 `infiniopCreateSwiGLUDescriptor()` 初始化的算子描述符。
 - `c`:
-  输出张量，张量限制见[创建算子描述](#创建算子描述)部分；
+  输出张量，张量限制见[创建算子描述](#创建算子描述)部分。
 - `a`:
-  输入张量，张量限制见[创建算子描述](#创建算子描述)部分；
+  输入张量，张量限制见[创建算子描述](#创建算子描述)部分。
 - `b`:
-  门控输入张量，张量限制见[创建算子描述](#创建算子描述)部分；
+  门控输入张量，张量限制见[创建算子描述](#创建算子描述)部分。
 - `stream`:
-  计算流/队列；
+  计算流/队列。
 
 <div style="background-color: lightblue; padding: 1px;">  返回值：</div>
 
@@ -63,15 +63,15 @@ infiniStatus_t infiniopCreateSwiGLUDescriptor(
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
 - `handle`
- : `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]；
+ : `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]。
 - `desc_ptr`:
-  `infiniopSwiGLUDescriptor_t` 指针，指向将被初始化的算子描述符地址；
+  `infiniopSwiGLUDescriptor_t` 指针，指向将被初始化的算子描述符地址。
 - `c` - { dT | (...) | (...) }:
-  算子计算参数 `c` 的张量描述, 支持原位计算；
+  算子计算参数 `c` 的张量描述, 支持原位计算。
 - `a` - { dT | (...) | (...) }:
-  算子计算参数 `a` 的张量描述，支持原位计算；
+  算子计算参数 `a` 的张量描述，支持原位计算。
 - `b` - { dT | (...) | (...) }:
-  算子计算参数 `b` 的张量描述，支持原位计算；
+  算子计算参数 `b` 的张量描述，支持原位计算。
 
 参数限制：
 
@@ -80,7 +80,7 @@ infiniStatus_t infiniopCreateSwiGLUDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
-- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`],  [`INFINI_STATUS_BAD_TENSOR_SHAPE`], [`INFINI_STATUS_BAD_TENSOR_DTYPE`], [`INFINI_STATUS_BAD_TENSOR_STRIDES`], [`INFINI_STATUS_BAD_DEVICE`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`],  [`INFINI_STATUS_BAD_TENSOR_SHAPE`], [`INFINI_STATUS_BAD_TENSOR_DTYPE`], [`INFINI_STATUS_BAD_TENSOR_STRIDES`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`].
 
 ### 销毁算子描述符
 
@@ -97,7 +97,7 @@ infiniStatus_t infiniopDestroySwiGLUDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
 
-- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_DEVICE`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`].
 
 ## 已知问题
 
@@ -108,7 +108,7 @@ infiniStatus_t infiniopDestroySwiGLUDescriptor(
 
 [`INFINI_STATUS_SUCCESS`]: /common/status/README.md#INFINI_STATUS_SUCCESS
 [`INFINI_STATUS_BAD_PARAM`]: /common/status/README.md#INFINI_STATUS_BAD_PARAM
-[`INFINI_STATUS_BAD_DEVICE`]: /common/status/README.md#INFINI_STATUS_BAD_DEVICE
+[`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]: /common/status/README.md#INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED
 [`INFINI_STATUS_BAD_TENSOR_SHAPE`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_SHAPE
 [`INFINI_STATUS_BAD_TENSOR_DTYPE`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_DTYPE
 [`INFINI_STATUS_BAD_TENSOR_STRIDES`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_STRIDES

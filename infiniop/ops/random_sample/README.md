@@ -16,7 +16,7 @@ $$ P^{\prime} = \{ p_0^{\prime}, p_1^{\prime}, \dots, p_{n-1}^{\prime} \}, \quad
 其中
 
 - $p_i$ 是第 $i$ 个元素的原始概率；
-- Top-k 选择概率最高的前 `k`；
+- Top-k 选择概率最高的前 `k`。
 - Top-p 选择累计概率和达到设定阈值 `p` 的最小子集；
 
 ## 接口
@@ -51,7 +51,7 @@ infiniStatus_t infiniopRandomSample(
 - `probs`:
   概率分布数据。张量限制见[创建算子描述](#创建算子描述)部分；
 - `random_val`:
-  随机数种子，一般通过 Uniform 分布产生，范围是 $[0,1]$；
+  随机数种子，一般通过 Uniform 分布产生，范围是 $[0,1]$。
 - `topp`:
   top-p 采样阈值，使得采样只从靠前的概率和为 `topp` 的范围内进行，范围是 $[0,1]$。当 `topp` 为0时，采样退化为 **Argmax** 算子。当 `topp` 大于等于1时，不设置 top-p 阈值；
 - `topk`:
@@ -67,8 +67,8 @@ infiniStatus_t infiniopRandomSample(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
-- 当 `random_val`、`topp`、`topk`、或 `temperature` 超出范围返回 [`INFINI_STATUS_BAD_PARAM`]；
-- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_INSUFFICIENT_WORKSPACE`], [`INFINI_STATUS_BAD_DEVICE`], [`INFINI_STATUS_EXECUTION_FAILED`].
+- 当 `random_val`、`topp`、`topk`、或 `temperature` 超出范围返回 [`INFINI_STATUS_BAD_PARAM`]。
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_INSUFFICIENT_WORKSPACE`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`], [`INFINI_STATUS_INTERNAL_ERROR`].
 
 ### 创建算子描述
 
@@ -84,7 +84,7 @@ infiniStatus_t infiniopCreateRandomSampleDescriptor(
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
 - `handle`:
-  `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]；
+  `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]。
 - `desc_ptr`:
   `infiniopRandomSampleDescriptor_t` 指针，指向将被初始化的算子描述符地址；
 - `result` - ${ dOut | (,) | (,) }$:
@@ -94,13 +94,13 @@ infiniStatus_t infiniopCreateRandomSampleDescriptor(
 
 参数限制：
 
-- `dT`: `Float16` 或 `Float32`；
-- `dOut`: `Uint64`；
+- `dT`: `Float16` 或 `Float32`。
+- `dOut`: `Uint64`。
 - `N`: N > 0；
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
-- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_BAD_TENSOR_SHAPE`], [`INFINI_STATUS_BAD_TENSOR_DTYPE`], [`INFINI_STATUS_BAD_TENSOR_STRIDES`], [`INFINI_STATUS_BAD_DEVICE`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_BAD_TENSOR_SHAPE`], [`INFINI_STATUS_BAD_TENSOR_DTYPE`], [`INFINI_STATUS_BAD_TENSOR_STRIDES`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`].
 
 ### 计算额外工作空间
 
@@ -120,7 +120,7 @@ infiniStatus_t infiniopGetRandomSampleWorkspaceSize(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
-- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_BAD_DEVICE`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`].
 
 ### 销毁算子描述符
 
@@ -137,7 +137,7 @@ infiniStatus_t infiniopDestroyRandomSampleDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
 
-- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_DEVICE`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`].
 
 ## 已知问题
 
@@ -152,8 +152,8 @@ infiniStatus_t infiniopDestroyRandomSampleDescriptor(
 [`INFINI_STATUS_SUCCESS`]: /common/status/README.md#INFINI_STATUS_SUCCESS
 [`INFINI_STATUS_BAD_PARAM`]: /common/status/README.md#INFINI_STATUS_BAD_PARAM
 [`INFINI_STATUS_INSUFFICIENT_WORKSPACE`]: /common/status/README.md#INFINI_STATUS_INSUFFICIENT_WORKSPACE
-[`INFINI_STATUS_BAD_DEVICE`]: /common/status/README.md#INFINI_STATUS_BAD_DEVICE
-[`INFINI_STATUS_EXECUTION_FAILED`]: /common/status/README.md#INFINI_STATUS_EXECUTION_FAILED
+[`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]: /common/status/README.md#INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED
+[`INFINI_STATUS_INTERNAL_ERROR`]: /common/status/README.md#INFINI_STATUS_INTERNAL_ERROR
 [`INFINI_STATUS_BAD_TENSOR_SHAPE`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_SHAPE
 [`INFINI_STATUS_BAD_TENSOR_DTYPE`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_DTYPE
 [`INFINI_STATUS_BAD_TENSOR_STRIDES`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_STRIDES

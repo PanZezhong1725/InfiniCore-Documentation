@@ -34,25 +34,25 @@ infiniStatus_t infiniopRMSNorm(
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
 
 - `desc`:
-  使用 `infiniopCreateRMSNormDescriptor()` 初始化的算子描述符；
+  使用 `infiniopCreateRMSNormDescriptor()` 初始化的算子描述符。
 - `workspace`:
-  算子计算所需的额外工作空间；
+  算子计算所需的额外工作空间。
 - `workspace_size`:
-  `workspace` 的大小，单位：字节；
+  `workspace` 的大小，单位：字节。
 - `y`:
-  计算结果地址。张量限制见[创建算子描述](#创建算子描述)部分；
+  计算结果地址。张量限制见[创建算子描述](#创建算子描述)部分。
 - `x`:
-  输入数据地址。张量限制见[创建算子描述](#创建算子描述)部分；
+  输入数据地址。张量限制见[创建算子描述](#创建算子描述)部分。
 - `w`:
-  权重数据地址（可选）。如果权重张量为 `NULL`，则不进行缩放；
+  权重数据地址（可选）。如果权重张量为 `NULL`，则不进行缩放。
 - `stream`:
-  计算流/队列；
+  计算流/队列。
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
 - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_INSUFFICIENT_WORKSPACE`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`], [`INFINI_STATUS_INTERNAL_ERROR`].
 
-- 当 `epsilon` 超出范围时返回 [`INFINI_STATUS_BAD_PARAM`]；
+- 当 `epsilon` 超出范围时返回 [`INFINI_STATUS_BAD_PARAM`]。
 
 ### 创建算子描述
 
@@ -70,22 +70,22 @@ infiniStatus_t infiniopCreateRMSNormDescriptor(
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
 - `handle`:
-  硬件控柄。详情请看：[`InfiniopHandle_t`]；
+  硬件控柄。详情请看：[`InfiniopHandle_t`]。
 - `desc_ptr`:
-  存放将被初始化的算子描述符地址；
+  存放将被初始化的算子描述符地址。
 - `y_desc` - { dT | (b, d) | (..., 1) }:
-  计算结果 `y` 的张量描述；
+  计算结果 `y` 的张量描述。
 - `x_desc` - { dT | (b, d) | (..., 1) }:
-  输入 `x` 的张量描述，形状和 `y_desc` 保持一致；
+  输入 `x` 的张量描述，形状和 `y_desc` 保持一致。
 - `w_desc` - { dW | (d,) | (1,) }:
-  权重 `w` 的张量描述。`w_desc` 为一维张量，长度和归一化维度的长度保持一致。如果权重张量为 `NULL`，则不进行缩放；
+  权重 `w` 的张量描述。`w_desc` 为一维张量，长度和归一化维度的长度保持一致。如果权重张量为 `NULL`，则不进行缩放。
 - `epsilon` - float:
-  用于避免除以零的小常数，范围是 $(0, 1]$；
+  用于避免除以零的小常数，范围是 $(0, 1]$。
 
 参数限制：
 
-- `dT`: (`Float16`, `Float32`) 之一；
-- `dW`: 当 `dT` 为 `Float16`时，为(`Float16`, `Float32`) 之一；当 `dT` 为 `Float32`时，为 `Float32`；
+- `dT`: (`Float16`, `Float32`) 之一。
+- `dW`: 当 `dT` 为 `Float16`时，为(`Float16`, `Float32`) 之一。当 `dT` 为 `Float32`时，为 `Float32`。
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
@@ -103,13 +103,13 @@ infiniStatus_t infiniopGetRMSNormWorkspaceSize(
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
 - `desc`:
-  使用 `infiniopCreateRMSNormDescriptor()` 初始化的算子描述符；
+  使用 `infiniopCreateRMSNormDescriptor()` 初始化的算子描述符。
 - `size`:
-  存放空间大小的计算结果的地址；
+  存放空间大小的计算结果的地址。
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
-- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_BAD_DEVICE`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`].
 
 ### 销毁算子描述符
 
@@ -122,7 +122,7 @@ infiniStatus_t infiniopDestroyRMSNormDescriptor(
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
 
 - `desc`:
-  待销毁的算子描述符；
+  待销毁的算子描述符。
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
 
