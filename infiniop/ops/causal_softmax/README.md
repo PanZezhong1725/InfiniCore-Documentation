@@ -14,7 +14,7 @@ $$ softmax(v_i) = \frac{e^{v_i}}{\sum_{k=0}^{N - 1} e^{v_k}} $$
 $$
 mask_{i,j} =
 \begin{cases}
-0 & \text{if } i \leq N - M + j \\
+0 & \text{if } j \leq N - M + i \\
 -\infty & \text{otherwise}
 \end{cases}
 $$
