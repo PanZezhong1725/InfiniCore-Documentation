@@ -1,7 +1,7 @@
 ﻿
-# `Rotary Position Embedding`
+# `RoPE`
 
-`Rotary Position Embedding`, 即**旋转位置编码**算子。
+`RoPE (Rotary Position Embedding)`, 即**旋转位置编码**算子。
 
 对于一个位置为 $m$ 的 token 的嵌入向量 $x$ 中的每两个相邻元素，即第 $2i$ 和 $2i+1$ 个元素，其旋转后的嵌入向量 $y$ 可以表示为：
 
@@ -160,5 +160,4 @@ infiniStatus_t infiniopDestroyRoPEDescriptor(
 [`INFINI_STATUS_BAD_TENSOR_STRIDES`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_STRIDES
 [`INFINI_STATUS_NULL_POINTER`]:/common/status/README.md#INFINI_STATUS_NULL_POINTER
 [`INFINI_STATUS_INSUFFICIENT_WORKSPACE`]:/common/status/README.md#INFINI_STATUS_INSUFFICIENT_WORKSPACE
-[`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]:/common/status/README.md#INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED
 [`INFINI_STATUS_INTERNAL_ERROR`]:/common/status/README.md#INFINI_STATUS_INTERNAL_ERROR
