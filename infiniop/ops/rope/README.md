@@ -37,8 +37,8 @@ infiniStatus_t infiniopRoPE(
     void *y,
     const void *x,
     const void *pos_ids,
-    const float *sin_table,
-    const float *cos_table,
+    const void *sin_table,
+    const void *cos_table,
     void *stream
 );
 ```
@@ -54,13 +54,13 @@ infiniStatus_t infiniopRoPE(
 - `y`:
   计算结果地址，当与 `x` 相同时为原地操作。
 - `x`:
-  嵌入向量矩阵（比如自注意力层中的 query 或 key）的数据指针，可与 `y` 相同。张量限制见[创建算子描述](#创建算子描述)部分。
+  嵌入向量矩阵（比如自注意力层中的 query 或 key）的数据指针，可与 `y` 相同。
 - `pos_ids`:
-  位置数值的地址，代表 `x` 中每个向量对应的 cos、sin 表中的序号。计算时，会根据序号选择表中的数值进行位置编码。用户应自行保证序号不会超过 cos、sin 表的长度。张量限制见[创建算子描述](#创建算子描述)部分。
+  位置数值的地址，代表 `x` 中每个向量对应的 cos、sin 表中的序号。计算时，会根据序号选择表中的数值进行位置编码。用户应自行保证序号不会超过 cos、sin 表的长度。
 - `sin_table`:
-  sin 表指针。张量限制见[创建算子描述](#创建算子描述)部分。
+  sin 表指针。
 - `cos_table`:
-  cos 表指针。张量限制见[创建算子描述](#创建算子描述)部分。
+  cos 表指针。
 - `stream`:
   计算流/队列。
 
@@ -85,7 +85,7 @@ infiniStatus_t infiniopCreateRoPEDescriptor(
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
 - `handle`
- : `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]。
+ : 硬件控柄。详见 [`InfiniopHandle_t`]。
 - `desc_ptr`:
   `infiniopRoPEDescriptor_t` 指针，指向将被初始化的算子描述符地址。
 - `y` - { dT | (seq_len, num_head, head_dim) | (..., 1) }:
@@ -102,7 +102,7 @@ infiniStatus_t infiniopCreateRoPEDescriptor(
 参数限制：
 
 - `dT`:  (`Float16`, `Float32`, `Float64`) 之一。
-- `dI`: (`Uint8`, `Uint16`, `Uint32`, `Uint64`) 之一。
+- `dI`: 任意整数类型。
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
