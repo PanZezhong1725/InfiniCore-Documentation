@@ -62,12 +62,12 @@ infiniStatus_t infiniopCreateAddDescriptor(
   `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]。
 - `desc_ptr`:
   `infiniopAddDescriptor_t` 指针，指向将被初始化的算子描述符地址；
-- `c_desc` - { dT | (...) | (...) }:
-  算子计算参数 `c` 的张量描述, 支持原位计算。
-- `a_desc` - { dT | (...) | (...) }:
-  算子计算参数 `a` 的张量描述，形状需与 `c_desc` 相同。支持原位计算，支持多向广播。
-- `b_desc` - { dT | (...) | (...) }:
-  算子计算参数 `b` 的张量描述，形状需与 `c_desc` 相同。支持原位计算，支持多向广播。
+- `c_desc` - { dT | (d1,...,dn) | (...) }:
+  算子计算参数 `c` 的张量描述，支持原位计算。
+- `a_desc` - { dT | (d1,...,dn) | (...) }:
+  算子计算参数 `a` 的张量描述，支持原位计算，支持多向广播。
+- `b_desc` - { dT | (d1,...,dn) | (...) }:
+  算子计算参数 `b` 的张量描述，支持原位计算，支持多向广播。
 
 参数限制：
 
@@ -98,7 +98,7 @@ infiniStatus_t infiniopGetAddWorkspaceSize(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
-- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_BAD_PARAM`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`].
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_NULL_POINTER`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`].
 
 ### 销毁算子描述符
 
@@ -129,6 +129,7 @@ infiniStatus_t infiniopDestroyAddDescriptor(
 [`INFINI_STATUS_INSUFFICIENT_WORKSPACE`]: /common/status/README.md#INFINI_STATUS_INSUFFICIENT_WORKSPACE
 [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]: /common/status/README.md#INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED
 [`INFINI_STATUS_INTERNAL_ERROR`]: /common/status/README.md#INFINI_STATUS_INTERNAL_ERROR
+[`INFINI_STATUS_NULL_POINTER`]: /common/status/README.md#INFINI_STATUS_NULL_POINTER
 [`INFINI_STATUS_BAD_TENSOR_SHAPE`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_SHAPE
 [`INFINI_STATUS_BAD_TENSOR_DTYPE`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_DTYPE
 [`INFINI_STATUS_BAD_TENSOR_STRIDES`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_STRIDES
