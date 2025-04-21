@@ -9,26 +9,22 @@
   q_{k,n} = clip\left( \left\lfloor \frac{w_{k,n}}{s_{g,n}} + z_{g,n} \right\rfloor, -8, 7 \right)
   $$
 
-- `Scale` 是一个形状为 `( num_groups, N )` 的张量，$s_{g,n}$ 是 Scale 的第 $(g, n)$ 个元素。 
-- `Zero` 是一个形状为 `( num_groups, N )` 的张量，$z_{g,n}$ 是 Zero 的第 $(g, n)$ 个元素。
-- `W` 是一个形状为 `( K, N )` 的张量，上面这个公式对于 $k \in [g \times \text{group}\_{}\text{size}, (g + 1) \times \text{group}\_{}\text{size})$ 成立，其中 $\text{group}\_{}\text{size} = 128$, K = $\text{num}\_{}\text{groups} \times \text{group}\_{}\text{size}$ 。
+- `Scale` 是一个形状为 `( num_groups, N )` 的张量， $s_{g,n}$ 是 Scale 的第 $(g, n)$ 个元素。 
+- `Zero` 是一个形状为 `( num_groups, N )` 的张量， $z_{g,n}$ 是 Zero 的第 $(g, n)$ 个元素。
+- `W` 是一个形状为 `( K, N )` 的张量，上面这个公式对于 $g \times$ group_size $\leq k < (g + 1) \times$ group_size 成立，其中 group_size = 128 ， K = num_groups $\times$ group_size 。
 
-反量化过程如下所示：
-
-  $$
-  \hat{w}_{k,n} = (q_{k,n} - z_{g,n}) \times s_{g,n}                          
-  $$
-
-最终得到计算结果，其中 $\hat{W}$ 是 $\hat{w}_{k,n}$ 构成的新矩阵。
+最终得到计算结果：
 
   $$
   C = A * \hat{W}
   $$
 
+其中 $\hat{W}$ 是 $(q_{k,n} - z_{g,n}) \times s_{g,n}$ 构成的新矩阵。
+
 - `A` 为左输入张量，形状为 `( M, K )`。
 - `C` 为输出张量，形状为 `( M, N )`。
 
-实际操作过程中会将量化以后的结果以 int4 的方式存储在一个形状为 $(\text{num}\_{}\text{groups}, 2 \times N)$ ，数据类型为 int32_t 的中间矩阵中。
+实际操作过程中会将量化以后的结果以 int4 的方式存储在一个形状为 (num_groups, $2 \times N$) ，数据类型为 int32_t 的中间矩阵中。
 ## 接口
 
 ### 计算
