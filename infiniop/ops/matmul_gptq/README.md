@@ -6,14 +6,16 @@
 其中量化过程如下所示：
 
   $$
-  q_{k,n} = clip\left( \left\lfloor \frac{w_{k,n}}{s_{g,n}} + z_{g,n} \right\rfloor, -8, 7 \right)
+  q_{k,n} = clip\left( \left\lfloor \frac{b_{k,n}}{s_{g,n}} + z_{g,n} \right\rfloor, -8, 7 \right)
   $$
 
 - `Scale` 是一个形状为 `( num_groups, N )` 的张量， $s_{g,n}$ 是 Scale 的第 $(g, n)$ 个元素。 
 - `Zero` 是一个形状为 `( num_groups, N )` 的张量， $z_{g,n}$ 是 Zero 的第 $(g, n)$ 个元素。
-- `W` 是一个形状为 `( K, N )` 的张量，上面这个公式对于 $g \times$ group_size $\leq k < (g + 1) \times$ group_size 成立，其中 group_size = 128 ， K = num_groups $\times$ group_size 。
+- `B` 是一个形状为 `( K, N )` 的张量，上面这个公式对于 $g \times$ group_size $\leq k < (g + 1) \times$ group_size 成立，其中 group_size = 128 ， K = num_groups $\times$ group_size 。
+- `Q` 是一个形状为 `( K / 16, 2N )` ，数据类型为 int32_t 的张量，一个元素存储 8 个 int4 类型的量化结果 $q_{k,n}$ 。
 
-最终得到计算结果：
+
+`Scale` 和 `Zero` 是 `B` 根据对应量化策略生成的张量，然后通过反量化过程得到计算结果：
 
   $$
   C = A * \hat{W}
@@ -24,10 +26,41 @@
 - `A` 为左输入张量，形状为 `( M, K )`。
 - `C` 为输出张量，形状为 `( M, N )`。
 
-实际操作过程中会将量化以后的结果以 int4 的方式存储在一个形状为 (num_groups, $2 \times N$) ，数据类型为 int32_t 的中间矩阵中。
 ## 接口
 
 ### 计算
+
+```c
+infiniStatus_t infiniopMatmulGptqQuant(
+    infiniopMatmulGptqDescriptor_t desc,
+    void *workspace,
+    size_t workspace_size,
+    void *q,
+    void *b_scale,
+    void *zero,
+    const void *b,
+    void *stream
+);
+```
+
+<div style="background-color: lightblue; padding: 1px;"> 参数： </div>
+
+- `desc`:
+  已使用 `infiniopCreateMatmulGptqDescriptor()` 初始化的算子描述符。
+- `workspace`:
+  额外工作空间。
+- `workspace_size`:
+  `workspace` 的大小，单位：字节。
+- `q`:
+  输出量化结果张量。张量限制见[创建算子描述](#创建算子描述)部分。
+- `b_scale`:
+  输出缩放因子张量。张量限制见[创建算子描述](#创建算子描述)部分。
+- `zero`:
+  输出零点张量。张量限制见[创建算子描述](#创建算子描述)部分。
+- `b`:
+  输入权重张量。张量限制见[创建算子描述](#创建算子描述)部分。
+- `stream`:
+  计算流/队列。
 
 ```c
 infiniStatus_t infiniopMatmulGptq(
@@ -36,9 +69,9 @@ infiniStatus_t infiniopMatmulGptq(
     size_t workspace_size,
     void *c,
     const void *a,
-    const void *b,
-    const void *b_scale,
-    const void *zero,
+    void *q,
+    void *b_scale,
+    void *zero,
     void *stream
 );
 ```
@@ -55,12 +88,12 @@ infiniStatus_t infiniopMatmulGptq(
   计算输出结果。张量限制见[创建算子描述](#创建算子描述)部分。
 - `a`:
   左输入张量。张量限制见[创建算子描述](#创建算子描述)部分。
-- `b`:
-  右输入张量。张量限制见[创建算子描述](#创建算子描述)部分。
-- `b_scale`:
-  缩放因子张量。张量限制见[创建算子描述](#创建算子描述)部分。
+- `q`:
+  输入量化结果张量。张量限制见[创建算子描述](#创建算子描述)部分。
+- `b_scale` - { dT | ( K, N) | (~) }:
+  输入缩放因子张量。
 - `zero`:
-  零点张量。张量限制见[创建算子描述](#创建算子描述)部分。
+  输入零点张量。张量限制见[创建算子描述](#创建算子描述)部分。
 - `stream`:
   计算流/队列。
 
@@ -76,7 +109,7 @@ infiniStatus_t infiniopCreateMatmulGptqDescriptor(
     infiniopMatmulGptqDescriptor_t *desc_ptr,
     infiniopTensorDescriptor_t c_desc,
     infiniopTensorDescriptor_t a_desc,
-    infiniopTensorDescriptor_t b_desc,
+    infiniopTensorDescriptor_t q_desc,
     infiniopTensorDescriptor_t b_scale_desc,
     infiniopTensorDescriptor_t zero_desc
 );
@@ -92,8 +125,8 @@ infiniStatus_t infiniopCreateMatmulGptqDescriptor(
   算子计算参数 `c` 的张量描述。
 - `a_desc` - { dT | ( M, K) | (~) }:
   算子计算参数 `a` 的张量描述。
-- `b_desc` - { dT | ( K, N) | (~) }:
-  算子计算参数 `b` 的张量描述。
+- `q_desc` - { dI | ( K / 16, 2N) | (~) }:
+  算子计算参数 `q` 的张量描述。
 - `b_scale_desc` - { dT | ( num_groups, N) | (~) }:
   算子计算参数 `b_scale` 的张量描述。
 - `zero_desc` - { dT | ( num_groups, N) | (~) }:
@@ -102,6 +135,7 @@ infiniStatus_t infiniopCreateMatmulGptqDescriptor(
 参数限制：
 
 - `dT`:  (`Float16`, `Float32`) 之一。
+- `dI`:  `Int4` 。
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
