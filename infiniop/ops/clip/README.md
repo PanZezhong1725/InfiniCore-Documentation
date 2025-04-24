@@ -68,9 +68,9 @@ infiniStatus_t infiniopCreateClipDescriptor(
   `infiniopHandle_t` 类型的硬件控柄。详情请看：[`InfiniopHandle_t`]
 - `desc_ptr`:
   `infiniopClipDescriptor_t` 指针，指向将被初始化的算子描述符地址。
-- `y` - $\{ dT | shape | strides_{dst} \}$:
+- `y` - {dT | (d1, ..., dn) | (...)} :
   算子输出的张量描述。
-- `x` - $\{ dT | shape | strides_{src} \}$:
+- `x` - {dT | (d1, ..., dn) | (...)} :
   算子输入的张量描述。
 
 
