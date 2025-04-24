@@ -2,17 +2,17 @@
 
 `Clip`，即**裁剪**算子。用于将输入张量的元素值限制在指定的最小值和最大值范围内。对于超出范围的值，将被裁剪到范围边界。
 
-对于输入张量 $x$，以及两个标量参数 $min\_val$和 $max\_val$，输出张量 $y$ 中的每个元素按以下规则计算：
+对于输入张量 $x$，以及两个标量参数 $minval$和 $maxval$，输出张量 $y$ 中的每个元素按以下规则计算：
 
 $$
 y_i = \begin{cases}
-min\_ val & \text{if } x_i < min\_ val \\
-max\_ val & \text{if } x_i > max\_ val \\
+minval & \text{if } x_i < minval \\
+maxval & \text{if } x_i > maxval \\
 x_i & \text{otherwise}
 \end{cases}
 $$
 
-例如，对于输入张量 $x = [-1.5, 0.5, 2.5]$，$min\_ val = -1.0$，$max\_ val = 2.0$，输出将是 $y = [-1.0, 0.5, 2.0]$。
+例如，对于输入张量 $x = [-1.5, 0.5, 2.5]$，$minval = -1.0$，$maxval = 2.0$，输出将是 $y = [-1.0, 0.5, 2.0]$。
 
 ## 接口
 
