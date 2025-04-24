@@ -76,10 +76,10 @@ infiniStatus_t infiniopCreateClipDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 参数限制：</div>
 
-- $dT$: `INFINI_DTYPE_F16`, `INFINI_DTYPE_F32`, `INFINI_DTYPE_F64`。
-- $shape$: 任意形状。
-- $strides_{out}$: 任意布局。
-- $strides_{in}$: 任意布局。
+- dT: `INFINI_DTYPE_F16`, `INFINI_DTYPE_F32`, `INFINI_DTYPE_F64`。
+- shape: 任意形状。
+- strides_{out}: 任意布局。
+- strides_{in}: 任意布局。
 
 
 
