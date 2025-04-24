@@ -23,8 +23,8 @@ infiniStatus_t infiniopClip(
     infiniopClipDescriptor_t desc,
     void *workspace,
     size_t workspace_size,
-    void *output,
-    const void *input,
+    void *y,
+    const void *x,
     float min_val,                      
     float max_val, 
     void *stream
@@ -39,9 +39,9 @@ infiniStatus_t infiniopClip(
   算子执行所需的工作空间。
 - `workspace_size`:
   工作空间大小，以字节为单位。
-- `output`:
+- `y`:
   计算输出结果。
-- `input`:
+- `x`:
   输入张量。
 - `stream`:
   计算流/队列。
