@@ -6,29 +6,38 @@
 其中量化过程如下所示：
 
   $$
-  q_{k,n} = clip\left( \left\lfloor \frac{b_{k,n}}{s_{g,n}} + z_{g,n} \right\rfloor, -8, 7 \right)
+  q_{n, k} = clip\left( \left\lfloor \frac{w_{n, k}}{s_{n, g}} + z_{n, g} \right\rfloor, 0, 15 \right)
   $$
 
-- `Scale` 是一个形状为 `( num_groups, N )` 的张量， $s_{g,n}$ 是 Scale 的第 $(g, n)$ 个元素。 
-- `Zero` 是一个形状为 `( num_groups, N )` 的张量， $z_{g,n}$ 是 Zero 的第 $(g, n)$ 个元素。
-- `B` 是一个形状为 `( K, N )` 的张量，上面这个公式对于 $g \times$ group_size $\leq k < (g + 1) \times$ group_size 成立，其中 group_size = 128 ， K = num_groups $\times$ group_size 。
-- `Q` 是一个形状为 `( K / 16, 2N )` ，数据类型为 int32_t 的张量，一个元素存储 8 个 int4 类型的量化结果 $q_{k,n}$ 。
+- `Scale` 是一个形状为 `( N, num_groups )` 的张量， $s_{n, g}$ 是 `Scale` 的第 $(n, g)$ 个元素。 
+- `Zero` 是一个形状为 `( N, num_groups )` 的张量， $z_{n, g}$ 是 `Zero` 的第 $(n, g)$ 个元素。
+- `W` 是一个形状为 `( N, K )` 的权重张量，如果 num_groups > 1 ，上面这个公式对于 $g \times$ group_size $\leq k < (g + 1) \times$ group_size 成立，其中 group_size = K / num_groups 。当 num_groups = 1 时，上述公式对于 $0 \leq k \leq K - 1$ 成立。
+- `Q` 是一个形状为 `( 2N, K / 16 )` ，数据类型为 int32_t 的张量，一个元素存储 8 个 int4 类型的量化结果 $q_{n, k}$ 。
 
 
-`Scale` 和 `Zero` 是 `B` 根据对应量化策略生成的张量，然后通过反量化过程得到计算结果：
+`Scale` ， `Zero` 和 `Q` 是根据权重 `W` 和输入张量 `X` 生成的缩放因子和零点， `Scale` 和 `Zero` 的生成方式大体如下所示：         
 
   $$
-  C = A * \hat{W}
+  s_{n, g} = \frac{\max_{k} \{w_{n, k} \} - \min_{k} \{w_{n, k} \}}{15}, \\
+  z_{n, g} = \left\lfloor \frac{- \min_{k} \{w_{n, k}\}}{s_{n, g}}  \right\rfloor
   $$
 
-其中 $\hat{W}$ 是 $(q_{k,n} - z_{g,n}) \times s_{g,n}$ 构成的新矩阵。
+有了缩放因子和零点以后，量化过程还需要不断调整权重 `W` 的元素，具体调整方式参考 https://zhuanlan.zhihu.com/p/692338716
 
-- `A` 为左输入张量，形状为 `( M, K )`。
-- `C` 为输出张量，形状为 `( M, N )`。
+这个算法希望找到一个量化过的权重 $\hat{W}$ ，使得新权重和旧权重之间输出结果差别最小，即：
+
+  $$
+  \arg \min_{\hat{W}} || \hat{W}X - WX||^2
+  $$
+
+其中 $\hat{W}$ 是 $(q_{n,k} - z_{n,g}) \times s_{n,g}$ 构成的量化权重张量。
+
+- `X` 为输入张量，形状为 `( K, M )`。
+- `C` 为输出张量，存储计算结果 $\hat{W}X$ ，形状为 `( N, M )`。
 
 ## 接口
 
-### 计算
+### 量化
 
 ```c
 infiniStatus_t infiniopMatmulGptqQuant(
