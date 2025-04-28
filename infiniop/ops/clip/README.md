@@ -2,17 +2,19 @@
 
 `Clip`，即**裁剪**算子。用于将输入张量的元素值限制在指定的最小值和最大值范围内。对于超出范围的值，将被裁剪到范围边界。
 
-对于输入张量 $x$，以及两个标量参数 $minval$和 $maxval$，输出张量 $y$ 中的每个元素按以下规则计算：
+对于输入张量 $x$，以及两个与输入相同形状的张量参数 $minval$和 $maxval$，输出张量 $y$ 中的每个元素按以下规则计算：
 
 $$
 y_i = \begin{cases}
-minval & \text{if } x_i < minval \\
-maxval & \text{if } x_i > maxval \\
+minval_i & \text{if } x_i < minval_i \\
+maxval_i & \text{if } x_i > maxval_i \\
 x_i & \text{otherwise}
 \end{cases}
 $$
 
-例如，对于输入张量 $x = [-1.5, 0.5, 2.5]$，minval = -1.0，maxval = 2.0，输出将是 $y = [-1.0, 0.5, 2.0]$。
+例如，对于输入张量 $x = [-1.5, 0.5, 2.5]$，minval = [-1.0, -1.0, -1.0]，maxval = [2.0, 2.0, 2.0]，输出将是 $y = [-1.0, 0.5, 2.0]$。
+
+每个元素都会与输入张量的对应元素进行比较。例如，对于输入张量 $x = [-1.5, 0.5, 2.5]$，minval = [-2.0, 0.0, 1.0]，maxval = [0.0, 1.0, 2.0]，输出将是 $y = [-1.5, 0.5, 2.0]$。
 
 ## 接口
 
@@ -25,8 +27,8 @@ infiniStatus_t infiniopClip(
     size_t workspace_size,
     void *y,
     const void *x,
-    float min_val,                      
-    float max_val, 
+    const void *min_val,
+    const void *max_val,
     void *stream
 );
 ```
@@ -46,9 +48,16 @@ infiniStatus_t infiniopClip(
 - `stream`:
   计算流/队列。
 - `min_val`:
-  裁剪的最小值。
+  裁剪的最小值，必须是与输入张量形状相同的张量。
 - `max_val`:
-  裁剪的最大值。
+  裁剪的最大值，必须是与输入张量形状相同的张量。
+
+<div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
+
+- [`INFINI_STATUS_SUCCESS`]: 成功执行计算。
+- [`INFINI_STATUS_BAD_TENSOR_DTYPE`]: 当数据类型不是F16、F32或F64时。
+- [`INFINI_STATUS_INSUFFICIENT_WORKSPACE`]: 当工作空间大小不足时（CUDA实现）。
+- [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]: 当设备类型不受支持时。
 
 
 ### 创建算子描述符
@@ -58,7 +67,9 @@ infiniStatus_t infiniopCreateClipDescriptor(
     infiniopHandle_t handle,
     infiniopClipDescriptor_t *desc_ptr,
     infiniopTensorDescriptor_t y,
-    infiniopTensorDescriptor_t x
+    infiniopTensorDescriptor_t x,
+    infiniopTensorDescriptor_t min_val,
+    infiniopTensorDescriptor_t max_val
 );
 ```
 
@@ -72,14 +83,26 @@ infiniStatus_t infiniopCreateClipDescriptor(
   算子输出的张量描述。
 - `x` - {dT | (d1, ..., dn) | (...)} :
   算子输入的张量描述。
+- `min_val` - {dT | (d1, ..., dn) | (...)} :
+  裁剪的最小值张量描述，必须是与输入张量形状相同的张量。
+- `max_val` - {dT | (d1, ..., dn) | (...)} :
+  裁剪的最大值张量描述，必须是与输入张量形状相同的张量。
 
 
 <div style="background-color: lightblue; padding: 1px;"> 参数限制：</div>
 
 - dT: `INFINI_DTYPE_F16`, `INFINI_DTYPE_F32`, `INFINI_DTYPE_F64`。
-- shape: 任意形状。
-- strides_{out}: 任意布局。
-- strides_{in}: 任意布局。
+- shape_{y, x}: 任意形状，但必须相同。
+- shape_{min_val, max_val}: 必须与输入张量形状相同。
+- strides_{y, x}: 任意布局。
+- strides_{min_val, max_val}: 任意布局。
+
+<div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
+
+- [`INFINI_STATUS_SUCCESS`]: 成功创建描述符。
+- [`INFINI_STATUS_BAD_TENSOR_DTYPE`]: 当数据类型不是F16、F32或F64时。
+- [`INFINI_STATUS_BAD_TENSOR_SHAPE`]: 当输入和输出张量形状不匹配时。
+- [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]: 当设备类型不受支持时。
 
 
 
@@ -99,6 +122,11 @@ infiniStatus_t infiniopGetClipWorkspaceSize(
 - `workspace_size`:
   输出。算子执行所需的工作空间大小，以字节为单位。
 
+<div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
+
+- [`INFINI_STATUS_SUCCESS`]: 成功获取工作空间大小。
+- [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]: 当设备类型不受支持时。
+
 ### 销毁算子描述符
 
 ```c
@@ -112,22 +140,30 @@ infiniStatus_t infiniopDestroyClipDescriptor(
 - `desc`:
   输入。待销毁的算子描述符。
 
+<div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
+
+- [`INFINI_STATUS_SUCCESS`]: 成功销毁描述符。
+- [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]: 当设备类型不受支持时。
+
 ## 实现细节
 
 Clip 算子是一个 elementwise 操作，它利用 InfiniCore 的 elementwise 基建实现。主要组件包括：
 
 - 描述符类 (Descriptor)：
   - 继承自 InfiniopDescriptor
-  - 存储 min_val 和 max_val 参数
+  - 存储 min_val 和 max_val 张量描述符
   - 包含 calculate 方法实现计算逻辑
 - 操作符类 (ClipOp)：
   - 定义 operator() 函数实现元素级操作
   - 支持不同数据类型（如 float, double, half）
+  - 支持张量形式的 min_val 和 max_val 输入
   - 对于 CUDA 实现，包含针对 half2 类型的优化
 
 ## 已知问题
 
-- 暂无
+
+- 在实现中使用了 `return max(min(x, max_val), min_val)` 的方式，这会导致当 min_val > max_val 时，输出总是等于 min_val，而不是预期的 max_val。
+
 <!-- 链接 -->
 [`InfiniopHandle_t`]: /infiniop/handle/README.md
 [`INFINI_STATUS_SUCCESS`]: /common/status/README.md#INFINI_STATUS_SUCCESS
@@ -137,3 +173,4 @@ Clip 算子是一个 elementwise 操作，它利用 InfiniCore 的 elementwise �
 [`INFINI_STATUS_BAD_TENSOR_STRIDES`]: /common/status/README.md#INFINI_STATUS_BAD_TENSOR_STRIDES
 [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]: /common/status/README.md#INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED
 [`INFINI_STATUS_INTERNAL_ERROR`]: /common/status/README.md#INFINI_STATUS_INTERNAL_ERROR
+[`INFINI_STATUS_INSUFFICIENT_WORKSPACE`]: /common/status/README.md#INFINI_STATUS_INSUFFICIENT_WORKSPACE
