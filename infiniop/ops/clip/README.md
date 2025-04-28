@@ -45,19 +45,18 @@ infiniStatus_t infiniopClip(
   计算输出结果。
 - `x`:
   输入张量。
-- `stream`:
-  计算流/队列。
 - `min_val`:
   裁剪的最小值，必须是与输入张量形状相同的张量。
 - `max_val`:
   裁剪的最大值，必须是与输入张量形状相同的张量。
-
+- `stream`:
+  计算流/队列。
 <div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
 
-- [`INFINI_STATUS_SUCCESS`]: 成功执行计算。
-- [`INFINI_STATUS_BAD_TENSOR_DTYPE`]: 当数据类型不是F16、F32或F64时。
-- [`INFINI_STATUS_INSUFFICIENT_WORKSPACE`]: 当工作空间大小不足时（CUDA实现）。
-- [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]: 当设备类型不受支持时。
+- [`INFINI_STATUS_SUCCESS`]
+- [`INFINI_STATUS_BAD_TENSOR_DTYPE`]
+- [`INFINI_STATUS_INSUFFICIENT_WORKSPACE`]
+- [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]
 
 
 ### 创建算子描述符
@@ -89,20 +88,14 @@ infiniStatus_t infiniopCreateClipDescriptor(
   裁剪的最大值张量描述，必须是与输入张量形状相同的张量。
 
 
-<div style="background-color: lightblue; padding: 1px;"> 参数限制：</div>
 
-- dT: `INFINI_DTYPE_F16`, `INFINI_DTYPE_F32`, `INFINI_DTYPE_F64`。
-- shape_{y, x}: 任意形状，但必须相同。
-- shape_{min_val, max_val}: 必须与输入张量形状相同。
-- strides_{y, x}: 任意布局。
-- strides_{min_val, max_val}: 任意布局。
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
-- [`INFINI_STATUS_SUCCESS`]: 成功创建描述符。
-- [`INFINI_STATUS_BAD_TENSOR_DTYPE`]: 当数据类型不是F16、F32或F64时。
-- [`INFINI_STATUS_BAD_TENSOR_SHAPE`]: 当输入和输出张量形状不匹配时。
-- [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]: 当设备类型不受支持时。
+- [`INFINI_STATUS_SUCCESS`]
+- [`INFINI_STATUS_BAD_TENSOR_DTYPE`]
+- [`INFINI_STATUS_BAD_TENSOR_SHAPE`]
+- [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]
 
 
 
@@ -142,22 +135,9 @@ infiniStatus_t infiniopDestroyClipDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
 
-- [`INFINI_STATUS_SUCCESS`]: 成功销毁描述符。
-- [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]: 当设备类型不受支持时。
+- [`INFINI_STATUS_SUCCESS`]
+- [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]
 
-## 实现细节
-
-Clip 算子是一个 elementwise 操作，它利用 InfiniCore 的 elementwise 基建实现。主要组件包括：
-
-- 描述符类 (Descriptor)：
-  - 继承自 InfiniopDescriptor
-  - 存储 min_val 和 max_val 张量描述符
-  - 包含 calculate 方法实现计算逻辑
-- 操作符类 (ClipOp)：
-  - 定义 operator() 函数实现元素级操作
-  - 支持不同数据类型（如 float, double, half）
-  - 支持张量形式的 min_val 和 max_val 输入
-  - 对于 CUDA 实现，包含针对 half2 类型的优化
 
 ## 已知问题
 
