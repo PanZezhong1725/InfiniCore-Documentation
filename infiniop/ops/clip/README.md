@@ -48,7 +48,7 @@ infiniStatus_t infiniopClip(
 - `min_val`:
   裁剪的最小值，必须是与输入张量形状相同的张量。
 - `max_val`:
-  裁剪的最大值，必须是与输入张量形状相同的张量。
+  裁剪的最大值，必须是与输入张量形状相同的张量。在实现中使用了 `return max(min(x, max_val), min_val)` 的方式，这会导致当 min_val > max_val 时，输出总是等于 min_val。
 - `stream`:
   计算流/队列。
 <div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
@@ -138,11 +138,6 @@ infiniStatus_t infiniopDestroyClipDescriptor(
 - [`INFINI_STATUS_SUCCESS`]
 - [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]
 
-
-## 已知问题
-
-
-- 在实现中使用了 `return max(min(x, max_val), min_val)` 的方式，这会导致当 min_val > max_val 时，输出总是等于 min_val，而不是预期的 max_val。
 
 <!-- 链接 -->
 [`InfiniopHandle_t`]: /infiniop/handle/README.md
