@@ -80,8 +80,6 @@ infiniStatus_t infiniopCreateGemmDescriptor(
 - `beta` - float:
   算子计算累加系数。
 
-<div style="background-color: lightblue; padding: 1px;"> 参数限制：</div>
-
 参数限制：
 
 - `dT`: (`Float16`, `Float32`) 之一；

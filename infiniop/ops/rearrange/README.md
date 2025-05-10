@@ -114,8 +114,6 @@ infiniStatus_t infiniopCreateRearrangeDescriptor(
 - `src_desc` - $\{ dT | shape | strides_{src} \}$:
   算子计算参数 `src` 的张量描述。
 
-<div style="background-color: lightblue; padding: 1px;"> 参数限制：</div>
-
 参数限制：
 
 - $dT$: 任意类型。
