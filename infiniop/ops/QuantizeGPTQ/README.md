@@ -28,7 +28,17 @@
   \arg \min_{\hat{W}} || \hat{W}X - WX||^2
   $$
 
-具体量化过程需要引入海森矩阵 $H = 2XX^T$ ，进而计算出 $H^{-1}$ ，假设权重矩阵分为若干块，每一块的大小为 $B \times K$ ，当更新到第 $i$ 块第 $j$ 行的时候，更新权重 $W_{:,i \times B + j :} -= ((W_{:,i \times B:(i + 1) \times B} - \hat{W}_{:,i \times B:(i + 1) \times B}) / H^{-1}_{:,i \times B:(i + 1) \times B}) H^{-1}_{i \times B:(i + 1) \times B, i \times B + j :}$ ，其中 $\hat{W}$ 是 $(q_{n,k} - z_{n,g}) \times s_{n,g}$ 构成的量化权重张量。
+具体量化过程需要引入海森逆矩阵 $H = (2XX^T)^{-1}$ ，假设权重矩阵分为若干块，每一块的大小为 $B \times K$ ，当更新到第 $i$ 块第 $j$ 行的时候，更新权重   
+
+  $$
+W_{:,i \times B + j :} -= (E_{:, i \times B:(i + 1) \times B} / H_{:,i \times B:(i + 1) \times B}) H_{i \times B:(i + 1) \times B, i \times B + j :}
+  $$ 
+
+  $$
+E_{:, i \times B:(i + 1) \times B} = (W_{:,i \times B:(i + 1) \times B} - \hat{W}_{:,i \times B:(i + 1) \times B})
+  $$ 
+
+其中 $\hat{W}$ 是 $(q_{n,k} - z_{n,g}) \times s_{n,g}$ 构成的量化权重张量。
 
 - `X` 为输入张量，形状为 `( K, M )`。
 - `C` 为输出张量，存储计算结果 $\hat{W}X$ ，形状为 `( N, M )`。
