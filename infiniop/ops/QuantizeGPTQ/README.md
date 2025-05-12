@@ -1,7 +1,7 @@
 
-# `MatmulGptq`
+# `QuantizeGPTQ`
 
-`MatmulGptq (Matmul Gradient Pre-Trained Quantization)`, 是一种针对大语言模型的高效后量化方法，旨在将模型权重从高精度（如 f16）量化为低精度（如 int4），同时最小化量化误差对模型性能的影响。
+`QuantizeGPTQ (Quantize Gradient Pre-Trained Quantization)`, 是一种针对大语言模型的高效后量化方法，旨在将模型权重从高精度（如 f16）量化为低精度（如 int4），同时最小化量化误差对模型性能的影响。
 
 其中量化过程如下所示：
 
@@ -15,22 +15,20 @@
 - `Q` 是一个形状为 `( N, K / 8 )` ，数据类型为 int32_t 的张量，一个元素存储 8 个 int4 类型的量化结果 $q_{n, k}$ 。
 
 
-`Scale` ， `Zero` 是根据权重 `W` 生成的缩放因子和零点， `Scale` 和 `Zero` 的生成方式大体如下所示：         
+`Scale` ， `Zero` 是根据权重 `W` 生成的缩放因子和零点，非对称量化对应的 `Scale` 和 `Zero` 的生成方式大体如下所示：         
 
   $$
   s_{n, g} = \frac{\max_{k} \{w_{n, k} \} - \min_{k} \{w_{n, k} \}}{15}, \\
   z_{n, g} = \left\lfloor \frac{- \min_{k} \{w_{n, k}\}}{s_{n, g}}  \right\rfloor
   $$
 
-关于一些细节的补充可以参考 https://zhuanlan.zhihu.com/p/692338716 ，源代码参考 https://github.com/IST-DASLab/gptq 。
-
-这个算法希望找到一个量化过的权重 $\hat{W}$ ，使得新权重和旧权重之间输出结果差别最小，即：
+`QuantizeGPTQ` 是在 `OBD (Optimal Brain Damage)` ， `OBS (Optimal Brain Surgeon)` 和 `OBQ (Optimal Brain Quantizer)` 基础上，对所有的行使用同样的顺序量化，这个算法希望找到一个量化过的权重 $\hat{W}$ ，使得新权重和旧权重之间输出结果差别最小，即：
 
   $$
   \arg \min_{\hat{W}} || \hat{W}X - WX||^2
   $$
 
-其中 $\hat{W}$ 是 $(q_{n,k} - z_{n,g}) \times s_{n,g}$ 构成的量化权重张量。
+具体量化过程需要引入海森矩阵 $H = 2XX^T$ ，进而计算出 $H^{-1}$ ，假设权重矩阵分为若干块，每一块的大小为 $B \times K$ ，当更新到第 $i$ 块第 $j$ 行的时候，更新权重 $W_{:,i \times B + j :} -= ((W_{:,i \times B:(i + 1) \times B} - \hat{W}_{:,i \times B:(i + 1) \times B}) / H^{-1}_{:,i \times B:(i + 1) \times B}) H^{-1}_{i \times B:(i + 1) \times B, i \times B + j :}$ ，其中 $\hat{W}$ 是 $(q_{n,k} - z_{n,g}) \times s_{n,g}$ 构成的量化权重张量。
 
 - `X` 为输入张量，形状为 `( K, M )`。
 - `C` 为输出张量，存储计算结果 $\hat{W}X$ ，形状为 `( N, M )`。
@@ -40,8 +38,8 @@
 ### 量化
 
 ```c
-infiniStatus_t infiniopMatmulQuant(
-    infiniopMatmulGptqDescriptor_t desc,
+infiniStatus_t infiniopQuantizeGPTQ(
+    infiniopQuantizeGPTQDescriptor_t desc,
     void *workspace,
     size_t workspace_size,
     void *packed_weights,
@@ -56,7 +54,7 @@ infiniStatus_t infiniopMatmulQuant(
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
 
 - `desc`:
-  已使用 `infiniopCreateMatmulGptqDescriptor()` 初始化的算子描述符。
+  已使用 `infiniopCreateQuantizeGPTQDescriptor()` 初始化的算子描述符。
 - `workspace`:
   额外工作空间。
 - `workspace_size`:
@@ -77,8 +75,8 @@ infiniStatus_t infiniopMatmulQuant(
 ### 计算
 
 ```c
-infiniStatus_t infiniopMatmulGptq(
-    infiniopMatmulGptqDescriptor_t desc,
+infiniStatus_t infiniopQuantizeLinearGPTQ(
+    infiniopQuantizeGPTQDescriptor_t desc,
     void *workspace,
     size_t workspace_size,
     void *c,
@@ -93,7 +91,7 @@ infiniStatus_t infiniopMatmulGptq(
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
 
 - `desc`:
-  已使用 `infiniopCreateMatmulGptqDescriptor()` 初始化的算子描述符。
+  已使用 `infiniopCreateQuantizeGPTQDescriptor()` 初始化的算子描述符。
 - `workspace`:
   额外工作空间。
 - `workspace_size`:
@@ -118,9 +116,9 @@ infiniStatus_t infiniopMatmulGptq(
 ### 创建算子描述
 
 ```c
-infiniStatus_t infiniopCreateMatmulGptqDescriptor(
+infiniStatus_t infiniopCreateQuantizeLinearGPTQDescriptor(
     infiniopHandle_t handle,
-    infiniopMatmulGptqDescriptor_t *desc_ptr,
+    infiniopQuantizeGPTQDescriptor_t *desc_ptr,
     infiniopTensorDescriptor_t c_desc,
     infiniopTensorDescriptor_t a_desc,
     infiniopTensorDescriptor_t packed_weights_desc,
@@ -134,7 +132,7 @@ infiniStatus_t infiniopCreateMatmulGptqDescriptor(
 - `handle`
  : 硬件控柄。详见 [`InfiniopHandle_t`]。
 - `desc_ptr`:
-  `infiniopMatmulGptqDescriptor_t` 指针，指向将被初始化的算子描述符地址。
+  `infiniopQuantizeGPTQDescriptor_t` 指针，指向将被初始化的算子描述符地址。
 - `c_desc` - { dT | ( N, M) | (~) }:
   算子计算参数 `c` 的张量描述。
 - `a_desc` - { dT | ( K, M) | (~) }:
@@ -158,8 +156,8 @@ infiniStatus_t infiniopCreateMatmulGptqDescriptor(
 ### 计算额外工作空间
 
 ```c
-infiniStatus_t infiniopGetMatmulGptqWorkspaceSize(
-    infiniopMatmulGptqDescriptor_t desc, 
+infiniStatus_t infiniopGetQuantizeGPTQWorkspaceSize(
+    infiniopQuantizeGPTQDescriptor_t desc, 
     size_t *size
 );
 ```
@@ -167,7 +165,7 @@ infiniStatus_t infiniopGetMatmulGptqWorkspaceSize(
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
 
 - `desc`:
-  已使用 `infiniopCreateMatmulGptqDescriptor()` 初始化的算子描述符。
+  已使用 `infiniopCreateQuantizeGPTQDescriptor()` 初始化的算子描述符。
 - `size`:
   额外空间大小的计算结果的写入地址。
 
@@ -178,8 +176,8 @@ infiniStatus_t infiniopGetMatmulGptqWorkspaceSize(
 ### 销毁算子描述符
 
 ```c
-infiniStatus_t infiniopDestroyMatmulGptqDescriptor(
-    infiniopMatmulGptqDescriptor_t desc
+infiniStatus_t infiniopDestroyQuantizeGPTQDescriptor(
+    infiniopQuantizeGPTQDescriptor_t desc
 );
 ```
 
