@@ -2,12 +2,13 @@
 
 `Conv`，即**卷积**算子。计算过程可表示为对输入特征图应用卷积核进行空间域的滑动窗口计算，是深度学习中的基础操作。
 
-$$ Y = \text{Conv}(X, W) $$
+$$ Y = \text{Conv}(X, W) + \text{bias} $$
 
 其中：
 
 - `X` 为输入特征图，形状为 `(N, C_in, D_1, D_2, ...)`。
 - `W` 为卷积核权重，形状为 `(C_out, C_in/groups, K_1, K_2, ...)`。
+- `bias` 为偏置项，形状为 `(1, C_out, 1, 1, ...)`。
 - `Y` 为输出特征图，形状为 `(N, C_out, D_out_1, D_out_2, ...)`。
 - 相关参数包括 `pads`, `strides`, `dilations` 等控制卷积操作细节。
 
@@ -23,6 +24,7 @@ infiniStatus_t infiniopConv(
     void *y,
     const void *x,
     const void *w,
+    const void *bias,
     void *stream
 );
 ```
@@ -41,6 +43,8 @@ infiniStatus_t infiniopConv(
   输入特征图。张量限制见创建算子描述部分。
 - `w`:
   卷积权重。张量限制见创建算子描述部分。
+- `bias`:
+  卷积偏置。张量限制见创建算子描述部分。
 - `stream`:
   计算流/队列。
 
@@ -57,6 +61,7 @@ infiniStatus_t infiniopCreateConvDescriptor(
     infiniopTensorDescriptor_t y,
     infiniopTensorDescriptor_t x,
     infiniopTensorDescriptor_t w,
+    infiniopTensorDescriptor_t b,
     void *pads,
     void *strides,
     void *dilations,
@@ -76,6 +81,8 @@ infiniStatus_t infiniopCreateConvDescriptor(
   算子计算参数 `x` 的张量描述。
 - `w` - { dT | (C_out, C_in/groups, K_1, K_2, ...) | (~) }:
   算子计算参数 `w` 的张量描述。
+- `b` - { dT | (1, C_out, 1, 1, ...) | (~) }:
+  算子计算参数 `b` 的张量描述，即卷积偏置项。
 - `pads` - void*:
   输入特征图填充大小的指针，数组长度为 `2*n`，表示每个空间维度的前后填充。
 - `strides` - void*:
@@ -139,7 +146,7 @@ infiniStatus_t infiniopDestroyConvDescriptor(
 - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`].
 
 <!-- 链接 -->
-[`InfiniopHandle_t`]: /infiniop/handle/README.md
+[`InfiniopHandle_t`]: README.md
 
 [`INFINI_STATUS_SUCCESS`]:/common/status/README.md#INFINI_STATUS_SUCCESS
 [`INFINI_STATUS_BAD_PARAM`]:/common/status/README.md#INFINI_STATUS_BAD_PARAM
