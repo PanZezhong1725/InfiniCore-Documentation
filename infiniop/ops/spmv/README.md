@@ -80,7 +80,7 @@ infiniStatus_t infiniopCreateSpMVDescriptor(
 - `values_desc` - { float32 | (nnz,) | (~) }:
   算子计算参数 `values` 的张量描述。
 - `row_ptr_desc` - { int32 | (M+1,) | (~) }:
-  算子计算参数 `row_indices` 的张量描述。
+  算子计算参数 `row_ptr` 的张量描述。
 - `col_indices_desc` - { int32 | (nnz,) | (~) }:
   算子计算参数 `col_indices` 的张量描述。
 
