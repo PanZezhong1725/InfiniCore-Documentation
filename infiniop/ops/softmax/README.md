@@ -1,4 +1,3 @@
-
 # `Softmax`
 
 归一化指数函数，常用于讲输入数据转换为概率分布。对于长度为 $N$ 的一维张量 $x$ ，其公式为：
@@ -14,6 +13,8 @@ $$ y_i = \frac{e^{x_i}}{\sum_{i=0}^{N - 1} e^{x_i}} $$
 ```c
 infiniStatus_t infiniopSoftmax(
     infiniopSoftmaxDescriptor_t desc, 
+    void *workspace,
+    size_t workspace_size,
     void *y, 
     const void *x, 
     void *stream
@@ -23,6 +24,8 @@ infiniStatus_t infiniopSoftmax(
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
 
 - `desc`：已使用 `infiniopCreateSoftmaxDescriptor()` 初始化的算子描述符。
+- `workspace`：工作空间指针。
+- `workspace_size`：工作空间大小。
 - `y`：输出指针。
 - `x`：输入指针，可以与 `y` 相同。
 - `stream`：计算流/队列。
@@ -33,7 +36,7 @@ infiniStatus_t infiniopSoftmax(
 
 ---
 
-### 创建算子描述
+### 创建算子描述符
 
 ```c
 infiniStatus_t infiniopCreateSoftmaxDescriptor(
@@ -63,6 +66,26 @@ infiniStatus_t infiniopCreateSoftmaxDescriptor(
 
 ---
 
+### 获取工作空间大小
+
+```c
+infiniStatus_t infiniopGetSoftmaxWorkspaceSize(
+    infiniopSoftmaxDescriptor_t desc,
+    size_t *size
+);
+```
+
+<div style="background-color: lightblue; padding: 1px;"> 参数： </div>
+
+- `desc`：已使用 `infiniopCreateSoftmaxDescriptor()` 初始化的算子描述符。
+- `size`：返回所需工作空间大小的指针。
+
+<div style="background-color: lightblue; padding: 1px;">  返回值：</div>
+
+- [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`]
+
+---
+
 ### 销毁算子描述符
 
 ```c
@@ -73,18 +96,11 @@ infiniStatus_t infiniopDestroySoftmaxDescriptor(
 
 <div style="background-color: lightblue; padding: 1px;"> 参数： </div>
 
-- `desc`
-     : 待销毁的算子描述符。
+- `desc`: 待销毁的算子描述符。
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值： </div>
 
 - [`INFINI_STATUS_SUCCESS`], [`INFINI_STATUS_DEVICE_TYPE_NOT_SUPPORTED`].
-
-## 已知问题
-
-### 平台限制
-
-- 寒武纪中 tensor.to(device) 的 tensor 不支持 uint64 或者是 int64 数据类型。
 
 <!-- 链接 -->
 [`InfiniopHandle_t`]: /infiniop/handle/README.md
