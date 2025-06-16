@@ -1,28 +1,37 @@
 # `Flash Attention`
 
-`Flash Attention`，是一种高效的**自注意力机制实现**，在加速注意力计算的同时也减少了内存占用。其核心原理是通过将输入分块，并在每个块上分别执行注意力计算操作，从而减少对 HBM 的读写。
+`Flash Attention`，是一种高效的**自注意力机制实现**，在加速注意力计算的同时也减少了内存占用。其核心原理是将输入分块，并在每个块上分别进行注意力计算，从而减少对 HBM 的读写次数以提高计算效率。
 
 标准 Attention 的计算为：
 1. 计算 $QK^T$，得到初步的注意力分数 attention_score；
 2. 添加位置编码以区别不同位置的元素，并乘以缩放系数；
 3. 根据注意力掩码屏蔽对应位置的元素，得到 masked_attention_score；
-4. 最后经过 softmax 计算，得到最终的注意力分数 attention_out。
+4. 最后经过 softmax 计算，并与 $V$ 相乘，得到最终的注意力分数 attention_out。
 
-而 FlashAttention 主要针对的是最后一步 softmax 的计算：
-1. 提前对输入的 QKV 进行分块；
-2. 分块 softmax 的增量计算，并维护两个全局变量： `max_score`：已处理块的最大值； `exp_sum`：已处理块的指数和
-    1. 若 $i=0$，计算当前的局部 softmax，
-        $$\mathrm{out}[0]=e^{S_{0}-m_{0}},\quad m_{0}=\max(S_{0}),\quad\mathrm{exp\_sum}_{0}=\sum e^{S_{0}-m_{0}}$$
-        并更新全局变量
-        $$\mathrm{max\_score}=m_{0},\quad\mathrm{exp\_sum}=\mathrm{exp\_sum}_{0}$$
-    2. 从 $i\ge1$ 开始，首先计算当前块的局部最大值 $m_i$ 和 $\mathrm{exp\_sum}_i$，并且有 
-        $$m_\mathrm{old}=\mathrm{max\_score},\quad m_\mathrm{new}=\max(m_\mathrm{old}, m_i)$$
-        然后根据该计算结果调整旧结果，并加入当前块结果 
-        $$\mathrm{out}[0:i]=\mathrm{out}[0:i]\cdot e^{m_\mathrm{old}-m_\mathrm{new}},\quad \mathrm{out}[i]=e^{S_i-m_\mathrm{new}}$$
-        并更新全局变量 
-        $$\mathrm{max\_score}=m_\mathrm{new},\quad\mathrm{exp\_sum}=\mathrm{exp\_sum}\cdot e^{m_{\mathrm{old}}-m_{\mathrm{new}}}+\mathrm{exp\_sum}_{i}$$
-    3. 最后，当所有块都处理完成后，可得 
-        $$\text{attention\_out}=\frac{\mathrm{out}}{\exp\_\mathrm{sum}}$$
+从中可以发现，若 SRAM 无法存储完整的计算数据，则计算过程中需要频繁访问 HBM，I/O 需求为 $O(Nd+N^2)$。此前，由于 softmax 的计算需要遍历整个序列以得到整体最大值，所以优化的方式往往是通过近似的方式来降低数据占用的空间。
+
+而 FlashAttention 给出了 softmax 的分块计算方式，以此代替原公式中的 softmax 计算，过程如下：
+1. 提前对输入的 QKV 进行分块（分别按照 QKV 的 sequence length 方向切分）；
+2. 增量计算分块 softmax ，并维护两个全局变量
+    - $m$：已处理块的最大值
+    - $\ell$：已处理块的指数和
+    
+    以计算 attention_out 中的第 j 块为例，需遍历 $Q$ 切分后的每一块
+    1. $Q_0$ 参与计算时，正常计算，并将计算结果直接保存在 attention_out[ j ] 中，并更新 $m$ 与 $\ell$；
+    2. 此后，$Q_i$ 参与计算时，先统计当前块 masked_attention_score 的最大值 $m_i$，并计算其指数和 $\ell_i$；
+        ```
+        P = e^{masked_attention_score - m_i}
+        l_i = rowsum(P)
+        ```
+    3. 更新 $m_{new}$ 为 $\max(m_i,m)$ ，并根据新的最大值计算 $\ell_{new}$，再由此计算新的 attention_out[ j ]；
+        ```
+        l_new = e^{m-m_new}*l+e^{m_i-m_new}
+        attention_out = (attention_out * l * e^{m-m_new} + e^{m_i-m_new} * P * V_j) / l_new 
+        ```
+    4. 分别用 $m_{new}$ 与 $\ell_{max}$ 更新 $m$ 与 $\ell$，开启新一块的计算;
+    5. 遍历完 $Q$ 之后，即可得到完整的 attention_out[ j ]
+
+    
 
 ## 接口
 
