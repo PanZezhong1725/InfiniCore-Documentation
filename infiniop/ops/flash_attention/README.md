@@ -10,13 +10,19 @@
 
 而 FlashAttention 主要针对的是最后一步 softmax 的计算：
 1. 提前对输入的 QKV 进行分块；
-2. 分块 softmax 的增量计算：维护两个全局变量 `max_score`：已处理块的最大值； `exp_sum`：已处理块的指数和
-    1. 若 $i=0$，计算当前的局部 softmax $$\mathrm{out}[0]=e^{S_{0}-m_{0}},\quad m_{0}=\max(S_{0}),\quad\mathrm{exp\_sum}_{0}=\sum e^{S_{0}-m_{0}}$$
-        并更新全局变量 $$\mathrm{max\_score}=m_{0},\quad\mathrm{exp\_sum}=\mathrm{exp\_sum}_{0}$$
-    2. 从 $i\ge1$ 开始，首先计算当前块的局部最大值 $m_i$ 和 $\mathrm{exp\_sum}_i$，并且有 $$m_\mathrm{old}=\mathrm{max\_score},\quad m_\mathrm{new}=\max(m_\mathrm{old}, m_i)$$
-        然后根据该计算结果调整旧结果，并加入当前块结果 $$\mathrm{out}[0:i]=\mathrm{out}[0:i]\cdot e^{m_\mathrm{old}-m_\mathrm{new}},\quad \mathrm{out}[i]=e^{S_i-m_\mathrm{new}}$$
-        并更新全局变量 $$\mathrm{max\_score}=m_\mathrm{new},\quad\mathrm{exp\_sum}=\mathrm{exp\_sum}\cdot e^{m_{\mathrm{old}}-m_{\mathrm{new}}}+\mathrm{exp\_sum}_{i}$$
-    3. 最后，当所有块都处理完成后，可得 $$\text{attention\_out}=\frac{\mathrm{out}}{\exp\_\mathrm{sum}}$$
+2. 分块 softmax 的增量计算，并维护两个全局变量： `max_score`：已处理块的最大值； `exp_sum`：已处理块的指数和
+    1. 若 $i=0$，计算当前的局部 softmax，
+        $$\mathrm{out}[0]=e^{S_{0}-m_{0}},\quad m_{0}=\max(S_{0}),\quad\mathrm{exp\_sum}_{0}=\sum e^{S_{0}-m_{0}}$$
+        并更新全局变量
+        $$\mathrm{max\_score}=m_{0},\quad\mathrm{exp\_sum}=\mathrm{exp\_sum}_{0}$$
+    2. 从 $i\ge1$ 开始，首先计算当前块的局部最大值 $m_i$ 和 $\mathrm{exp\_sum}_i$，并且有 
+        $$m_\mathrm{old}=\mathrm{max\_score},\quad m_\mathrm{new}=\max(m_\mathrm{old}, m_i)$$
+        然后根据该计算结果调整旧结果，并加入当前块结果 
+        $$\mathrm{out}[0:i]=\mathrm{out}[0:i]\cdot e^{m_\mathrm{old}-m_\mathrm{new}},\quad \mathrm{out}[i]=e^{S_i-m_\mathrm{new}}$$
+        并更新全局变量 
+        $$\mathrm{max\_score}=m_\mathrm{new},\quad\mathrm{exp\_sum}=\mathrm{exp\_sum}\cdot e^{m_{\mathrm{old}}-m_{\mathrm{new}}}+\mathrm{exp\_sum}_{i}$$
+    3. 最后，当所有块都处理完成后，可得 
+        $$\text{attention\_out}=\frac{\mathrm{out}}{\exp\_\mathrm{sum}}$$
 
 ## 接口
 
