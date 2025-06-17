@@ -109,7 +109,7 @@ infiniStatus_t infiniopCreateFlashAttentionDescriptor(
   算子计算参数 `v` 的张量描述，形状与 `out_desc` 一致，最后一维连续。
 - `mask_desc` - { dM | (seq_len_q, seq_len_kv) | ($\ldots, 1$)}:
   算子计算参数 `mask` 的张量描述，二维或者一维，最后一维连续。
-- `mask_type_desc` - int
+- `mask_type_desc` - int:
   算子计算参数 `mask_type` 的张量描述，取值为 0 ~ 3 的整数。
 
 参数限制：
@@ -120,7 +120,7 @@ infiniStatus_t infiniopCreateFlashAttentionDescriptor(
 - `num_heads_q` 与 `num_heads_kv` 可以不同，但需满足前者是后者的整数倍（非0整数）。
   - 当 $N_q/N_{kv}=1$ 时，即为 MQA (multi-query attention)
   - 当 $N_q/N_{kv}>1$ 时，即为 GQA (grouped-query attention)
-- `mask_type` 的四种类型：
+- `mask_type` 的四种类型（`Int64`）：
   - `0`: 不使用注意力掩码，忽略 `mask` 取值；
   - `1`: 使用完整 mask 矩阵，此时 `mask` 不能为空；
   - `2`: 代表leftUpCausal模式的mask，对应以左上顶点划分的下三角场景；
