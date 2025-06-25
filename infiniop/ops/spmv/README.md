@@ -20,7 +20,7 @@ infiniStatus_t infiniopSpMV(
     void *y,
     const void *x,
     const void *values,
-    const void *row_indices,
+    const void *row_ptr,
     const void *col_indices,
     void *stream
 );
@@ -36,7 +36,7 @@ infiniStatus_t infiniopSpMV(
   输入向量。
 - `values`:
   稀疏矩阵的非零元素值数组。
-- `row_indices`:
+- `row_ptr`:
   稀疏矩阵的行偏移数组。
 - `col_indices`:
   稀疏矩阵的列索引数组。
