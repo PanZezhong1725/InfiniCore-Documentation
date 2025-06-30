@@ -47,7 +47,6 @@ infiniStatus_t infiniopFlashAttention(
     const void *k,
     const void *v,
     void *mask,
-    void *mask_type,
     void *stream
 );
 ```
@@ -70,8 +69,6 @@ infiniStatus_t infiniopFlashAttention(
   值（Value）张量数据指针。张量限制见[创建算子描述](#创建算子描述)部分。
 - `mask`:
   注意力掩码的数据指针，取值为 `0` 或者 `false` 表示保留对应位置的元素（参与计算）；取值为 `1` 或者 `true` 表示屏蔽对应位置的元素（即跳过，不参与计算）。张量限制见[创建算子描述](#创建算子描述)部分。
-- `mask_type`:
-  注意力类型，取值为 0 ~ 3。张量限制见[创建算子描述](#创建算子描述)部分。
 - `stream`:
   计算流/队列。
 
@@ -90,7 +87,7 @@ infiniStatus_t infiniopCreateFlashAttentionDescriptor(
     infiniopTensorDescriptor_t k_desc,
     infiniopTensorDescriptor_t v_desc,
     infiniopTensorDescriptor_t mask_desc,
-    infiniopTensorDescriptor_t mask_type_desc) 
+    infiniopTensorDescriptor_t mask_type) 
 ```
 
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
@@ -107,10 +104,10 @@ infiniStatus_t infiniopCreateFlashAttentionDescriptor(
   算子计算参数 `k` 的张量描述，形状与 `out_desc` 一致，最后一维连续。
 - `v_desc` - { dT | ((batch_size,) seq_len_kv, num_heads_kv, head_dim) | ($\ldots, 1$)}:
   算子计算参数 `v` 的张量描述，形状与 `out_desc` 一致，最后一维连续。
-- `mask_desc` - { dM | (seq_len_q, seq_len_kv) | ($\ldots, 1$)}:
-  算子计算参数 `mask` 的张量描述，二维或者一维，最后一维连续。
-- `mask_type_desc` - int:
-  算子计算参数 `mask_type` 的张量描述，取值为 0 ~ 3 的整数。
+- `mask_desc` - { dM | (seq_len_q, seq_len_kv) | (~)}:
+  算子计算参数 `mask` 的张量描述，当 `mask_type=FULL_MASK` 时，`mask` 不可为空，其余情况 `mask` 可为`nullptr`。
+- `mask_type` - `infiniMasktype_t`:
+  注意力类型参数，有三种类型可选，详细见下文参数限制。
 
 参数限制：
 
@@ -120,11 +117,10 @@ infiniStatus_t infiniopCreateFlashAttentionDescriptor(
 - `num_heads_q` 与 `num_heads_kv` 可以不同，但需满足前者是后者的整数倍（非0整数）。
   - 当 $N_q/N_{kv}=1$ 时，即为 MQA (multi-query attention)
   - 当 $N_q/N_{kv}>1$ 时，即为 GQA (grouped-query attention)
-- `mask_type` 的四种类型（`Int64`）：
-  - `0`: 不使用注意力掩码，忽略 `mask` 取值；
-  - `1`: 使用完整 mask 矩阵，此时 `mask` 不能为空；
-  - `2`: 代表leftUpCausal模式的mask，对应以左上顶点划分的下三角场景；
-  - `3`: 代表rightDownCausal模式的mask，对应以右下顶点划分的下三角场景。
+- `mask_type` 的三种类型：
+  - `INFINI_MASK_NO=0`: 不使用注意力掩码，忽略 `mask` 取值；
+  - `INFINI_MASK_FULL=1`: 使用完整 mask 矩阵，此时 `mask` 不能为空；
+  - `INFINI_MASK_CAUSAL=2`: 使用标准因果掩码，对应以左上顶点划分的下三角场景，忽略 `mask` 取值；
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
