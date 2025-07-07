@@ -146,9 +146,7 @@ infiniStatus_t infiniopDestroyRearrangeDescriptor(
 
 ## 已知问题
 
-### 平台限制
-
-- 除 CPU 外，其他平台不支持 3 阶以上的张量。
+无
 
 <!-- 链接 -->
 [`InfiniopHandle_t`]: /infiniop/handle/README.md
