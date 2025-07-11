@@ -84,8 +84,8 @@ infiniStatus_t infiniopCreateRMSNormDescriptor(
 
 参数限制：
 
-- `dT`: (`Float16`, `Float32`) 之一。
-- `dW`: 当 `dT` 为 `Float16`时，为(`Float16`, `Float32`) 之一。当 `dT` 为 `Float32`时，为 `Float32`。
+- `dT`: (`Float16`, `Float32`, `BFloat16`) 之一。
+- `dW`: 与 `dT` 相同，或为 `Float32`。
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 

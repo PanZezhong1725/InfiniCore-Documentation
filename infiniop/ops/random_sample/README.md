@@ -94,7 +94,7 @@ infiniStatus_t infiniopCreateRandomSampleDescriptor(
 
 参数限制：
 
-- `dT`: `Float16` 或 `Float32`。
+- `dT`: (`Float16`, `Float32`, `BFloat16`) 之一。
 - `dOut`: `Uint64`。
 - `N`: N > 0；
 
