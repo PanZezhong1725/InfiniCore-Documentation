@@ -55,7 +55,7 @@ infiniStatus_t infiniopCreateSoftmaxDescriptor(
 
 参数限制：
 
-- **`dT`**:  (`Float16`, `Float32`, `Double`) 之一。
+- **`dT`**:  (`Float16`, `Float32`, `Float64`) 之一。
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 

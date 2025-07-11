@@ -75,7 +75,7 @@ infiniStatus_t infiniopCreateSwiGLUDescriptor(
 
 参数限制：
 
-- `dT`:  (`Float16`, `Float32`, `Double`, `Bfloat16`) 之一
+- `dT`:  (`Float16`, `Float32`, `Float64`, `Bfloat16`) 之一
 - `c`, `a`, `b` 均支持不连续步长
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>

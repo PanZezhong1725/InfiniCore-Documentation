@@ -71,7 +71,7 @@ infiniStatus_t infiniopCreateAddDescriptor(
 
 参数限制：
 
-- `dT`:  (`Float16`, `Float32`, `Float64`) 之一。
+- `dT`:  (`Float16`, `Float32`, `Float64`, `BFloat16`) 之一。
 - 输入 `a` 与 `b` 的形状需与 `c` 相同。`a` 与 `b` 涉及多向广播时需调整步长以匹配多向广播的映射关系。
 - 支持原位计算，即计算时 `c` 可以和 `a` 或 `b` 指向同一地址。
 - 计算输出参数 `c` 不能进行广播（`c` 的步长不能涉及广播设置，即步长不能有 0）

@@ -84,7 +84,7 @@ infiniStatus_t infiniopCreateGemmDescriptor(
 
 参数限制：
 
-- `dT`: (`Float16`, `Float32`) 之一；
+- `dT`: (`Float16`, `Float32`, `BFloat16`) 之一；
 - `[batch,]`: `batch ≥ 1`（可选）；
 - `M`: M > 0；
 - `N`: N > 0；
