@@ -1,6 +1,6 @@
 # `Flash Attention`
 
-`Flash Attention`，是一种高效的**自注意力机制实现**，在加速注意力计算的同时也减少了内存占用。其核心原理是将输入分块，并在每个块上分别进行注意力计算，从而减少对 HBM 的读写次数以提高计算效率。
+`Flash Attention`，是一种高效的**自注意力机制实现**，在加速注意力计算的同时也减少了内存占用。其核心原理是将输入分块，在每个块上分别进行注意力计算，从而减少对 HBM 的读写次数以提高计算效率。
 
 标准 Attention 的计算为：
 1. 计算 $QK^T$，得到初步的注意力分数 attention_score；
@@ -17,19 +17,19 @@
     - $\ell$：已处理块的指数和
     
     以计算 attention_out 中的第 j 块为例，需遍历 $Q$ 切分后的每一块
-    1. $Q_0$ 参与计算时，正常计算，并将计算结果直接保存在 attention_out[ j ] 中，并更新 $m$ 与 $\ell$；
-    2. 此后，$Q_i$ 参与计算时，先统计当前块 masked_attention_score 的最大值 $m_i$，并计算其指数和 $\ell_i$；
+    1. $Q_0$ 参与计算时，正常计算，并将计算结果直接保存在 attention_out[j] 中，并更新 $m$ 与 $\ell$；
+    2. 此后， $Q_i$ 参与计算时，先统计当前块 masked_attention_score 的最大值 $m_i$，并计算其指数和 $\ell_i$；
         ```
         P = e^{masked_attention_score - m_i}
         l_i = rowsum(P)
         ```
-    3. 更新 $m_{new}$ 为 $\max(m_i,m)$ ，并根据新的最大值计算 $\ell_{new}$，再由此计算新的 attention_out[ j ]；
+    3. 更新 $m_{new}$ 为 $\max(m_i,m)$ ，并根据新的最大值计算 $\ell_{new}$，再由此计算新的 attention_out[j]；
         ```
         l_new = e^{m-m_new}*l+e^{m_i-m_new}
         attention_out = (attention_out * l * e^{m-m_new} + e^{m_i-m_new} * P * V_j) / l_new 
         ```
     4. 分别用 $m_{new}$ 与 $\ell_{max}$ 更新 $m$ 与 $\ell$，开启新一块的计算;
-    5. 遍历完 $Q$ 之后，即可得到完整的 attention_out[ j ]
+    5. 遍历完 $Q$ 之后，即可得到完整的 attention_out[j]
 
     
 
@@ -46,7 +46,7 @@ infiniStatus_t infiniopFlashAttention(
     const void *q,
     const void *k,
     const void *v,
-    void *mask,
+    const void *mask,
     void *stream
 );
 ```
@@ -68,7 +68,7 @@ infiniStatus_t infiniopFlashAttention(
 - `v`:
   值（Value）张量数据指针。张量限制见[创建算子描述](#创建算子描述)部分。
 - `mask`:
-  注意力掩码的数据指针，取值为 `0` 或者 `false` 表示保留对应位置的元素（参与计算）；取值为 `1` 或者 `true` 表示屏蔽对应位置的元素（即跳过，不参与计算）。张量限制见[创建算子描述](#创建算子描述)部分。
+  注意力掩码的数据指针，可选参数。取值为 `0` 时表示保留对应位置的元素（参与计算）；取值为 `-inf` （负无穷）时表示屏蔽对应位置的元素（即跳过，不参与计算）。张量限制见[创建算子描述](#创建算子描述)部分。
 - `stream`:
   计算流/队列。
 
@@ -87,7 +87,7 @@ infiniStatus_t infiniopCreateFlashAttentionDescriptor(
     infiniopTensorDescriptor_t k_desc,
     infiniopTensorDescriptor_t v_desc,
     infiniopTensorDescriptor_t mask_desc,
-    infiniopTensorDescriptor_t mask_type) 
+    infiniopAttentionMaskType_t mask_type) 
 ```
 
 <div style="background-color: lightblue; padding: 1px;"> 参数：</div>
@@ -105,22 +105,22 @@ infiniStatus_t infiniopCreateFlashAttentionDescriptor(
 - `v_desc` - { dT | ((batch_size,) seq_len_kv, num_heads_kv, head_dim) | ($\ldots, 1$)}:
   算子计算参数 `v` 的张量描述，形状与 `out_desc` 一致，最后一维连续。
 - `mask_desc` - { dM | (seq_len_q, seq_len_kv) | (~)}:
-  算子计算参数 `mask` 的张量描述，当 `mask_type=FULL_MASK` 时，`mask` 不可为空，其余情况 `mask` 可为`nullptr`。
-- `mask_type` - `infiniMasktype_t`:
-  注意力类型参数，有三种类型可选，详细见下文参数限制。
+  算子计算参数 `mask` 的张量描述，当 `mask_type=INFINIOP_ATTENTION_MASK_TYPE_FULL` 时，`mask` 不可为空，其余情况 `mask` 可为`nullptr`。
+- `mask_type` - `infiniopAttentionMaskType_t`:
+  注意力类型参数，有三种类型可选，详细见参数限制。
 
 参数限制：
 
 - `dT`: `Float16`, `Float32` 或 `BFloat16`。
-- `dM`: `Bool` 或 `Uint8`。
+- `dM`: `Flaot32`。
 - `seq_len_q` 与 `seq_len_kv` 可以不同。
 - `num_heads_q` 与 `num_heads_kv` 可以不同，但需满足前者是后者的整数倍（非0整数）。
   - 当 $N_q/N_{kv}=1$ 时，即为 MQA (multi-query attention)
   - 当 $N_q/N_{kv}>1$ 时，即为 GQA (grouped-query attention)
 - `mask_type` 的三种类型：
-  - `INFINI_MASK_NO=0`: 不使用注意力掩码，忽略 `mask` 取值；
-  - `INFINI_MASK_FULL=1`: 使用完整 mask 矩阵，此时 `mask` 不能为空；
-  - `INFINI_MASK_CAUSAL=2`: 使用标准因果掩码，对应以左上顶点划分的下三角场景，忽略 `mask` 取值；
+  - `INFINIOP_ATTENTION_MASK_TYPE_NONE=0`: 不使用注意力掩码，忽略 `mask` 取值；
+  - `INFINIOP_ATTENTION_MASK_TYPE_FULL=1`: 使用完整 mask 矩阵，此时 `mask` 不可为空；
+  - `INFINIOP_ATTENTION_MASK_TYPE_CAUSAL=2`: 使用标准因果掩码，对应以左上顶点划分的下三角场景，忽略 `mask` 取值；
 
 <div style="background-color: lightblue; padding: 1px;"> 返回值：</div>
 
